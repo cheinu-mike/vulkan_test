@@ -4,18 +4,28 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 
-VkResult vkCreateInstance(
-		const VkInstanceCreateInfo* pCreateInfo, 
-		const VkAllocationCallbacks* pAllocator, 
-		VkIntance* instance) {
-	if (pCreateInfo == nullptr || instance == nullptr) {
-		log("null pointer passed to required parameter");
-		return VK_ERROR_INITIALIZATION_FAILED;
-	}
+const std::vector<const char*> validationLayers = {
+	"VK_LAYER_LUNARG_standard_validation"
+};
 
-	return real_vkCreateInstance(pCreateInfo, pAllocator, instance);
+#ifdef NDEBUG
+	const bool enableValidationLayers = false;
+#else
+	const bool enableValidationLayers = true;
+#endif
+
+bool vulkanapp::checkValidationLayerSupport() {
+	uint32_t layerCount;
+	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+	std::vector<VkLayerProperties> availableLayers(layerCount);
+	vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+	
+	return false;
 }
+
 void vulkanapp::initWindow (){
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -24,8 +34,23 @@ void vulkanapp::initWindow (){
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
 }
 
+void vulkanapp::pickPhysicalDevice(){
+	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+
+	uint32_t deviceCount = 0;
+	vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+	
+	if (deviceCount == 0){
+		throw std::runtime_error("failed to find any GPUs on this device");
+	}
+
+	std::vector<VkPhysicalDevice> devices(deviceCount);
+	vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+	
+}
 void vulkanapp::initVulkan (){
 	createInstance();
+	pickPhysicalDevice();
 }
 
 void vulkanapp::mainLoop() {
@@ -43,7 +68,7 @@ void vulkanapp::cleanup() {
 
 
 void vulkanapp::createInstance(){
-	VkApplicationInfo appInfo ={};
+	VkApplicationInfo appInfo = {};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.pApplicationName = "Hello Triangle";
 	appInfo.applicationVersion = VK_MAKE_VERSION(1,1,0);

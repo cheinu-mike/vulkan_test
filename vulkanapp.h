@@ -22,8 +22,10 @@ private:
 	GLFWwindow* window;
 
 	void initWindow();
+	void pickPhysicalDevice();
 	void initVulkan();
 	void mainLoop ();
 	void cleanup();
 	void createInstance();
+	bool checkValidationLayerSupport();
 };
