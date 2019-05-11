@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <X11/Xlib.h>
 
 class testing {
 public:
@@ -38,11 +39,24 @@ int main() {
 	uint32_t devicecount = 0;
 	VkPhysicalDevice physicaldevice = VK_NULL_HANDLE;
 	//VkQueue vkqueue;
-	VkCommandPool commandpool;
+	VkCommandPool commandpool = VK_NULL_HANDLE;
 
 	VkQueueFamilyProperties qfamilystruct;
 
-	std::vector<VkCommandBuffer> cmdbuffers = {};
+	/*1
+	try{
+		std::cout << "inside try block" << std::endl;
+		std::vector<VkCommandBuffer> cmdbuffers = {VK_NULL_HANDLE};
+	}
+	catch(...){
+		std::cout << "VkCommandBuffer vector not initialized" << std::endl;
+	}
+	*/
+
+	std::vector <VkCommandBuffer> cmdbuffers = {};
+
+	VkSurfaceKHR surface;
+	Display *display = XOpenDisplay(0);
 
 	VkApplicationInfo appinfo = {};
 	VkInstanceCreateInfo instanceCI = {};
@@ -127,6 +141,12 @@ int main() {
 
 	testresult(resultdevice, "vk device creation");
 	
+	//Surface Creation
+	VkXlibSurfaceCreateInfoKHR surfacexlib = {};
+	surfacexlib.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
+	surfacexlib.pNext = NULL;
+	surfacexlib.dpy = &display;
+
 	//Command Buffer Section
 	//first get the queue family number count
 	uint32_t familypropertycount; //family property count amount of queue families for queueFamilyIndex;
@@ -146,15 +166,16 @@ int main() {
 	VkCommandPoolCreateInfo cmdpoolinfo = {};
 	cmdpoolinfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	cmdpoolinfo.pNext = NULL;
-	cmdpoolinfo.queueFamilyIndex = 1;
+	cmdpoolinfo.queueFamilyIndex = 15;
 	cmdpoolinfo.flags = 0;
 
 	VkResult commandpoolresult = vkCreateCommandPool(device, &cmdpoolinfo, nullptr, &commandpool);
 	
-	testresult(commandpoolresult,"vk command pool creation");	
+	testresult(commandpoolresult,"vk command pool creation");
 
+	std::cout << &commandpool << std::endl;
 	
-	cmdbuffers.resize(1);
+	cmdbuffers.resize(15);
 	VkCommandBufferAllocateInfo cmd = {};
 	cmd.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	cmd.pNext = NULL;
@@ -162,12 +183,30 @@ int main() {
 	cmd.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	cmd.commandBufferCount = (uint32_t) cmdbuffers.size();
 	
-	std::cout << "size of commandbuffercount " << cmd.commandBufferCount << std::endl;
-	std::cout << "size of " << cmdbuffers.size() << std::endl;
-	//VkResult cmdallocate = vkAllocateCommandBuffers(device, &cmd, &commandbuffers[0]);
+	std::cout << "cmd.commandbuffercount " << cmd.commandBufferCount << std::endl;
+	std::cout << "size of cmdbuffer vector" << cmdbuffers.size() << std::endl;
 
-	//testresult(cmdallocate, "vk command allocation");
+	VkCommandBufferBeginInfo begininfo = {};
+	begininfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	begininfo.pNext = NULL;
+	begininfo.flags = 0;
 
+	VkResult begincmdbuff = vkBeginCommandBuffer(cmdbuffers[0], &begininfo);
+
+	testresult(begincmdbuff, "vk begin command buffer thing");
+
+	std::cout << "before segfault" << std::endl;
+
+	VkResult cmdallocate = vkAllocateCommandBuffers(device, &cmd, &cmdbuffers[0]);
+
+	//VkResult cmdallocate = vkAllocateCommandBuffers(device, &cmd, nullptr); 
+
+	std::cout << "you are here" << std::endl;
+
+	testresult(cmdallocate, "vk command allocation");
+	
+	vkDestroyCommandPool(device, commandpool, nullptr);
+	vkDestroyDevice(device, nullptr);
 	vkDestroyInstance(inst, nullptr);
 	//vkDestroyDevice(device, nullptr);
 	glfwTerminate();
