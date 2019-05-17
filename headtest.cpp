@@ -16,6 +16,7 @@ void vulkantest::run(){
 	commandbuffers();
 	surfacecreation();
 	swapchaincreation();
+	imageviewcreation();
 
 	mainloop();
 	cleanup();
@@ -105,17 +106,22 @@ void vulkantest::devicestructs(){
 		std::cout << "Physical Device Enumeration failed" << std::endl;
 		std::cout << "physical device error code: " << holder << std::endl;
 	}
+
 	VkResult resultdevice = vkCreateDevice(physicaldevice, &deviceinfo, nullptr, &device);
 
 	testresult(resultdevice, "vk device creation");
 	
-	uint32_t familypropertycount; //family property count amount of queue families for queueFamilyIndex;
-
 	vkGetPhysicalDeviceQueueFamilyProperties(physicaldevice, &familypropertycount, nullptr);
 	vkGetPhysicalDeviceQueueFamilyProperties(physicaldevice, &familypropertycount, &qfamilystruct);
 	std::cout << "family property count: " << familypropertycount << std::endl;
 	std::cout << "family struct queueflags: " << qfamilystruct.queueFlags << std::endl;
-	std::cout << "family struct queuecount (amount of queue families): " << qfamilystruct.queueCount << std::endl;
+	std::cout << "family struct queuecount: " << qfamilystruct.queueCount << std::endl;
+	
+	vkGetDeviceQueue(device, 0, 0, &vkqueue);
+	vkGetDeviceQueue2(device, &queueinfo2, &vkqueue);
+	//get some more info on queue2;
+	std::cout << "queueinfo2.queueFamilyIndex: " << queueinfo2.queueFamilyIndex << std::endl;
+	std::cout << "queueinfo2.queueIndex: " << queueinfo2.queueIndex << std::endl;
 
 }
 
@@ -133,13 +139,13 @@ void vulkantest::commandbuffers(){
 
 	std::cout << &commandpool << std::endl;
 	
-	cmdbuffers.resize(15);
+	//cmdbuffers.resize(15);
 	VkCommandBufferAllocateInfo cmd = {};
 	cmd.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	cmd.pNext = NULL;
 	cmd.commandPool = commandpool;
 	cmd.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	cmd.commandBufferCount = (uint32_t) cmdbuffers.size();
+	cmd.commandBufferCount = 1; //(uint32_t) cmdbuffers.size();
 	
 	std::cout << "cmd.commandbuffercount " << cmd.commandBufferCount << std::endl;
 	std::cout << "size of cmdbuffer vector" << cmdbuffers.size() << std::endl;
@@ -150,13 +156,13 @@ void vulkantest::commandbuffers(){
 	begininfo.flags = 0;
 
 	//segfaulting with the VkCommandBuffer vector bullshit
-	VkResult begincmdbuff = vkBeginCommandBuffer(cmdbuffers[0], &begininfo);
+	//VkResult begincmdbuff = vkBeginCommandBuffer(cmdbuffers[0], &begininfo);
 
-	testresult(begincmdbuff, "vk begin command buffer thing");
+	//testresult(begincmdbuff, "vk begin command buffer thing");
 
 	std::cout << "before segfault" << std::endl;
 
-	VkResult cmdallocate = vkAllocateCommandBuffers(device, &cmd, &cmdbuffers[0]);
+	VkResult cmdallocate = vkAllocateCommandBuffers(device, &cmd, &cmdbuffer2); 
 
 	//VkResult cmdallocate = vkAllocateCommandBuffers(device, &cmd, nullptr); 
 
@@ -177,24 +183,55 @@ void vulkantest::surfacecreation(){
 }
 
 void vulkantest::swapchaincreation(){
+	
+	/*
 	VkSwapchainCreateInfoKHR swapcreate = {};
 	swapcreate.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	swapcreate.pNext = NULL;
 	swapcreate.surface = surface;
-	//swapcreate.minImageCount = ;
-	//swapcreate.imageformat = ;
-	swapcreate.imageColorSpace = ;
-	swapcreate.imageExtent = ;
+	swapcreate.minImageCount = 1;
+	swapcreate.imageformat = format;
+	//swapcreate.imageColorSpace = ;
+	swapcreate.imageExtent.width = Width;
+	swapcreate.imageExtent.height = Height;
 	swapcreate.imageArrayLayers = ;
 	swapcreate.imageUsage = ;
 	swapcreate.imageSharingMode = ;
-	swapcreate.queueFamilyIndexCount = ;
+	swapcreate.queueFamilyIndexCount = 2;
 	swapcreate.pQueueFamilyIndices = ;
 	swapcreate.preTransform = ;
 	swapcreate.compositeAlpha = ;
 	swapcreate.presentMode = ;
 	swapcreate.clipped = ;
 	swapcreate.oldSwapchain = ;
+	*/
+	
+}
+
+void vulkantest::imageviewcreation(){
+	
+	VkImageViewCreateInfo imageviewinfo = {};
+	imageviewinfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	imageviewinfo.pNext = NULL;
+	imageviewinfo.flags = 0;
+	imageviewinfo.image = image;
+	imageviewinfo.viewType = imageviewtype;
+	imageviewinfo.format = format;
+	imageviewinfo.components.r = VK_COMPONENT_SWIZZLE_R;
+	imageviewinfo.components.g = VK_COMPONENT_SWIZZLE_G;
+	imageviewinfo.components.b = VK_COMPONENT_SWIZZLE_B;
+	imageviewinfo.components.a = VK_COMPONENT_SWIZZLE_A;
+	imageviewinfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+	imageviewinfo.subresourceRange.baseMipLevel = 0;
+	imageviewinfo.subresourceRange.levelCount = 1;
+	imageviewinfo.subresourceRange.baseArrayLayer = 0;
+	imageviewinfo.subresourceRange.layerCount = 1;
+	
+	std::cout << "before segfault" << std::endl;
+
+	VkResult imageviewcreate = vkCreateImageView(device, &imageviewinfo, nullptr, &imageview);
+
+	testresult(imageviewcreate, "vk image view creation");	
 }
 
 void vulkantest::mainloop(){

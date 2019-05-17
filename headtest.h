@@ -43,11 +43,15 @@ private:
 	VkDevice device;
 	uint32_t devicecount = 0;
 	VkPhysicalDevice physicaldevice = VK_NULL_HANDLE;
-	//VkQueue vkqueue;
 	VkCommandPool commandpool = VK_NULL_HANDLE;
 
+	//queue variables
+	VkQueue vkqueue;
 	VkQueueFamilyProperties qfamilystruct;
-
+	uint32_t familypropertycount;
+	VkDeviceQueueInfo2 queueinfo2;
+	const uint32_t qindexcount = 15;
+	
 	/*
 	try{
 		std::cout << "inside try block" << std::endl;
@@ -59,6 +63,7 @@ private:
 	*/
 
 	std::vector <VkCommandBuffer> cmdbuffers = {};
+	VkCommandBuffer cmdbuffer2;
 
 	VkSurfaceKHR surface;
 
@@ -67,6 +72,15 @@ private:
 
 	Display* display = glfwGetX11Display();
 	Window x11window = glfwGetX11Window(window);
+
+	VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
+
+	//Image variables
+	VkImage image;
+	VkImageView imageview = VK_NULL_HANDLE;
+	VkImageViewType imageviewtype = VK_IMAGE_VIEW_TYPE_2D;
+	VkComponentMapping componentmapping;
+	VkImageSubresourceRange imagesubresourcerange;
 	//===========================================
 	
 	void initwindow();
@@ -76,6 +90,7 @@ private:
 	void commandbuffers();
 	void surfacecreation();
 	void swapchaincreation();
+	void imageviewcreation(); 
 
 	void mainloop();
 	void cleanup();
