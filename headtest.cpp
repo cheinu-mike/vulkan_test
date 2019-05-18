@@ -1,16 +1,21 @@
 #define GLFW_INCLUDE_VULKAN
 #define VK_USE_PLATFORM_XLIB_KHR
 #include "/usr/include/GLFW/glfw3.h"
+//#include "/usr/include/GLFW/glfw3native.h"
 
 #include "/home/cheinu/Documents/vulkanapp/headtest.h"
 #include <iostream>
 #include <vector>
 #include <string>
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 void vulkantest::run(){
 
 	initwindow();
+
+	getxlib();
+
 	createinstance();
 	devicestructs();
 	commandbuffers();
@@ -25,10 +30,45 @@ void vulkantest::run(){
 void vulkantest::initwindow(){
 	glfwInit();
 
+	if (glfwVulkanSupported()){
+			std::cout << "Vulkan is supported" << std::endl;
+	}
+	else{
+			std::cout << "Vulkan is not supported" << std::endl;
+	}
+
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	window = glfwCreateWindow(Width, Height, "Vulkan", nullptr, nullptr);
+}
+
+void vulkantest::getxlib(){
+
+	glfwGetMonitors(monitorcount);
+	std::cout << "monitor count: " << *monitorcount << std::endl;
+	//monitorname = glfwGetMonitorName(monitor);
+	//std::cout << "monitor name: " << *monitorname << std::endl;
+
+	std::cout << "glfw display: " << display << std::endl;
+	std::cout << "X11 display: " << display2 << std::endl;
+	screencount = XScreenCount(display2);
+	std::cout << "X screen count: " << screencount << std::endl;
+	screen = XDefaultScreenOfDisplay(display2); 
+	screenindex = XDefaultScreen(display2);
+	std::cout << "X Screen Index: " << screenindex << std::endl;
+	depth = XDefaultDepthOfScreen(screen);
+	std::cout << "X depth: " << depth << std::endl;
+	visualtype = XDefaultVisual(display2, screenindex);
+	std::cout << "X visual: " << visualtype << std::endl;
+	XMatchVisualInfo(display2, screenindex, depth, TrueColor, &vinfo);
+	visualid = vinfo.visualid;
+	Visual *vis = vinfo.visual;
+	std::cout << "vinfo.visual: " << &vis << std::endl;
+	std::cout << "vinfo.visualid: " << vinfo.visualid << std::endl;
+	std::cout << "vinfo.screen: " << vinfo.screen << std::endl;
+	//std::cout << "vinfo.class: " << vinfo.class << std::endl;
+	std::cout << "vinfo.depth: " << vinfo.depth << std::endl;
 }
 
 void vulkantest::createinstance(){
@@ -58,26 +98,7 @@ void vulkantest::createinstance(){
 }
 
 void vulkantest::devicestructs(){
-
-	float qpriorities[1] = {0.0};
-	VkDeviceQueueCreateInfo qcreateinfo = {};
-	qcreateinfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	qcreateinfo.pNext = NULL;
-	qcreateinfo.queueCount = 1;
-	qcreateinfo.pQueuePriorities = qpriorities;
-		
 	
-	VkDeviceCreateInfo deviceinfo = {};
-	deviceinfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	deviceinfo.pNext = NULL;
-	deviceinfo.queueCreateInfoCount = 1;
-	deviceinfo.pQueueCreateInfos = &qcreateinfo;
-	deviceinfo.enabledExtensionCount = 0;
-	deviceinfo.ppEnabledExtensionNames = NULL;
-	deviceinfo.enabledLayerCount = 0;
-	deviceinfo.ppEnabledLayerNames = NULL;
-	deviceinfo.pEnabledFeatures = NULL;
-
 	VkResult holder = vkEnumeratePhysicalDevices(inst, &devicecount, nullptr); //puts a number into devicecount
 
 	if (holder == VK_SUCCESS) {
@@ -107,22 +128,57 @@ void vulkantest::devicestructs(){
 		std::cout << "physical device error code: " << holder << std::endl;
 	}
 
-	VkResult resultdevice = vkCreateDevice(physicaldevice, &deviceinfo, nullptr, &device);
-
-	testresult(resultdevice, "vk device creation");
-	
 	vkGetPhysicalDeviceQueueFamilyProperties(physicaldevice, &familypropertycount, nullptr);
+	std::cout << "familypropertycount: " << familypropertycount << std::endl;
 	vkGetPhysicalDeviceQueueFamilyProperties(physicaldevice, &familypropertycount, &qfamilystruct);
 	std::cout << "family property count: " << familypropertycount << std::endl;
 	std::cout << "family struct queueflags: " << qfamilystruct.queueFlags << std::endl;
 	std::cout << "family struct queuecount: " << qfamilystruct.queueCount << std::endl;
 	
-	vkGetDeviceQueue(device, 0, 0, &vkqueue);
-	vkGetDeviceQueue2(device, &queueinfo2, &vkqueue);
-	//get some more info on queue2;
-	std::cout << "queueinfo2.queueFamilyIndex: " << queueinfo2.queueFamilyIndex << std::endl;
-	std::cout << "queueinfo2.queueIndex: " << queueinfo2.queueIndex << std::endl;
+	if (qfamilystruct.queueFlags & VK_QUEUE_GRAPHICS_BIT){
+			std::cout << "graphics bit success" << std::endl;
+	}
+	else {
+			std::cout << "what are you doing?" << std::endl;
+	}
 
+	float qpriorities[1] = {0.0};
+	VkDeviceQueueCreateInfo qcreateinfo = {};
+	qcreateinfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+	qcreateinfo.pNext = NULL;
+	qcreateinfo.queueFamilyIndex = 0; //create function that will find the appropritate queue family
+	qcreateinfo.queueCount = queuecountnum;
+	qcreateinfo.pQueuePriorities = qpriorities;
+
+	for (uint32_t i=0; i < familypropertycount; i++){
+			if (vkGetPhysicalDeviceXlibPresentationSupportKHR(physicaldevice, i, display, visualid) == 1){
+					std::cout << "queue family index supported: " << i << std::endl;
+			}
+			else{
+					std::cout << "no queue family supports Xlib" << std::endl;
+			}
+	}
+	//vkGetDeviceQueue(device, 0, 0, &vkqueue);
+	//vkGetDeviceQueue2(device, &queueinfo2, &vkqueue);
+	//get some more info on queue2;
+	//std::cout << "queueinfo2.queueFamilyIndex: " << queueinfo2.queueFamilyIndex << std::endl;
+	//std::cout << "queueinfo2.queueIndex: " << queueinfo2.queueIndex << std::endl;
+
+	VkDeviceCreateInfo deviceinfo = {};
+	deviceinfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	deviceinfo.pNext = NULL;
+	deviceinfo.queueCreateInfoCount = 1;
+	deviceinfo.pQueueCreateInfos = &qcreateinfo;
+	deviceinfo.enabledExtensionCount = 0;
+	deviceinfo.ppEnabledExtensionNames = NULL;
+	deviceinfo.enabledLayerCount = 0;
+	deviceinfo.ppEnabledLayerNames = NULL;
+	deviceinfo.pEnabledFeatures = NULL;
+
+	VkResult resultdevice = vkCreateDevice(physicaldevice, &deviceinfo, nullptr, &device);
+
+	testresult(resultdevice, "vk device creation");
+	
 }
 
 void vulkantest::commandbuffers(){
@@ -180,6 +236,10 @@ void vulkantest::surfacecreation(){
 	surfaceinfo.dpy = display;
 	surfaceinfo.window = x11window;	
 
+	if (glfwCreateWindowSurface(inst, window, nullptr, &surface) != VK_SUCCESS){
+			std::cout << "failed to create surface" << std::endl;
+	}
+
 }
 
 void vulkantest::swapchaincreation(){
@@ -214,7 +274,7 @@ void vulkantest::imageviewcreation(){
 	imageviewinfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	imageviewinfo.pNext = NULL;
 	imageviewinfo.flags = 0;
-	imageviewinfo.image = image;
+	imageviewinfo.image = image[0];
 	imageviewinfo.viewType = imageviewtype;
 	imageviewinfo.format = format;
 	imageviewinfo.components.r = VK_COMPONENT_SWIZZLE_R;
@@ -229,7 +289,7 @@ void vulkantest::imageviewcreation(){
 	
 	std::cout << "before segfault" << std::endl;
 
-	VkResult imageviewcreate = vkCreateImageView(device, &imageviewinfo, nullptr, &imageview);
+	VkResult imageviewcreate = vkCreateImageView(device, &imageviewinfo, nullptr, &imageview[0]);
 
 	testresult(imageviewcreate, "vk image view creation");	
 }

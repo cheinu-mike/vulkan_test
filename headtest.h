@@ -35,9 +35,12 @@ private:
 	const int Height = 600;
 
 	GLFWwindow* window;
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const char* monitorname;
 
 	uint32_t glfwExtensionCount = 0;
 	const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+	int * monitorcount;
 
 	VkInstance inst;
 	VkDevice device;
@@ -49,6 +52,7 @@ private:
 	VkQueue vkqueue;
 	VkQueueFamilyProperties qfamilystruct;
 	uint32_t familypropertycount;
+	uint32_t queuecountnum;
 	VkDeviceQueueInfo2 queueinfo2;
 	const uint32_t qindexcount = 15;
 	
@@ -68,22 +72,32 @@ private:
 	VkSurfaceKHR surface;
 
 	//Xlib Surface Stuff
-	//Display *display = XOpenDisplay(0);
+	Display *display2 = XOpenDisplay(0);
 
 	Display* display = glfwGetX11Display();
 	Window x11window = glfwGetX11Window(window);
+	int screencount = 0;
+	int screenindex = 0;
+	Screen* screen;
+	int depth = 0;
+	int classvalue = 0;
+	Visual *visualtype;
+	XVisualInfo vinfo;
+	VisualID visualid;
 
 	VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
 
 	//Image variables
-	VkImage image;
-	VkImageView imageview = VK_NULL_HANDLE;
+	std::vector<VkImage> image = std::vector<VkImage> (1);
+	std::vector<VkImageView> imageview = std::vector<VkImageView> (1);
 	VkImageViewType imageviewtype = VK_IMAGE_VIEW_TYPE_2D;
 	VkComponentMapping componentmapping;
 	VkImageSubresourceRange imagesubresourcerange;
 	//===========================================
 	
 	void initwindow();
+
+	void getxlib();
 
 	void createinstance();
 	void devicestructs();
