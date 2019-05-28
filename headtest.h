@@ -1,5 +1,7 @@
 #pragma once
 
+#define _GLFW_X11
+#define _GLFW_HAS_XINPUT
 #define GLFW_INCLUDE_VULKAN
 #define GLFW_EXPOSE_NATIVE_X11
 #define VK_USE_PLATFORM_XLIB_KHR
@@ -11,18 +13,64 @@
 #include <vector>
 #include <X11/Xlib.h>
 
+struct vkvectors {
+		
+	const int Width = 800;
+	const int Height = 400;
+
+	//xlib stuff
+	int initcount = 0;	
+	int* monitorcount = &initcount;
+
+	GLFWwindow* window;
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const char* monitorname;
+
+	PFN_vkCreateInstance pfnCreateInstance = (PFN_vkCreateInstance)
+    	glfwGetInstanceProcAddress(NULL, "vkCreateInstance");
+
+	uint32_t glfwExtensionCount = 2; //assuming it's 2 but use vkEnumerateDeviceExtentionProperties
+	const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+	//int code = glfwGetError(NULL);
+	
+	Display* display = glfwGetX11Display();
+	Window x11window = glfwGetX11Window(window);
+
+	//device creation
+	const char* initextensionname = "VK_KHR_xlib_surface";
+	const char* const* extensionnames = &initextensionname; 
+	std::vector<VkPhysicalDevice> physicaldevicevec;
+	//queue variables;
+	std::vector<uint32_t> qfamindex;
+	std::vector<VkQueue> vkqueue;
+
+	std::vector<VkExtensionProperties> extensionproperties;
+	std::vector<VkCommandBuffer> cmdbuffers;
+
+	//surface
+	VkSurfaceCapabilitiesKHR surfacecapabilities;
+	uint32_t presentmodecount;
+	VkPresentModeKHR presentmode;
+
+	//images
+	std::vector<VkImage> image; 
+	std::vector<VkImageView> imageview;
+};
 
 class vulkantest {
 public:
 	
+	//vkvectors* vkinfo = (vkvectors*)(malloc(sizeof(vkvectors)));
+	vkvectors* vkinfo = new vkvectors;
+
 	bool testresult(VkResult result, std::string fname){
 		if (result == VK_SUCCESS){
-			std::cout << fname << " successful" << std::endl;
+			std::cout << "\t ==="  << fname << " successful ===" << std::endl;
 			return true;
 		}
 		else {
-			std::cout << fname << " failed" << std::endl;
-			std::cout << fname << " error code: " << result << std::endl;
+			std::cout << "\t ===" << fname << " failed ===" << std::endl;
+			std::cout << "\t ===" << fname << " error code: " << result << " ===" << std::endl;
 			return false;
 		}
 	}
@@ -30,17 +78,11 @@ public:
 	void run();
 
 private:
+
 	//==============================================
 	const int Width = 800;
 	const int Height = 600;
 
-	GLFWwindow* window;
-	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-	const char* monitorname;
-
-	uint32_t glfwExtensionCount = 0;
-	const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-	int * monitorcount;
 
 	VkInstance inst;
 	VkDevice device;
@@ -48,25 +90,16 @@ private:
 	VkPhysicalDevice physicaldevice = VK_NULL_HANDLE;
 	VkCommandPool commandpool = VK_NULL_HANDLE;
 
+	uint32_t propertycount;
+
 	//queue variables
-	VkQueue vkqueue;
+	//VkQueue vkqueue;
 	VkQueueFamilyProperties qfamilystruct;
 	uint32_t familypropertycount;
 	uint32_t queuecountnum;
 	VkDeviceQueueInfo2 queueinfo2;
 	const uint32_t qindexcount = 15;
 	
-	/*
-	try{
-		std::cout << "inside try block" << std::endl;
-		std::vector<VkCommandBuffer> cmdbuffers = {VK_NULL_HANDLE};
-	}
-	catch(...){
-		std::cout << "VkCommandBuffer vector not initialized" << std::endl;
-	}
-	*/
-
-	std::vector <VkCommandBuffer> cmdbuffers = {};
 	VkCommandBuffer cmdbuffer2;
 
 	VkSurfaceKHR surface;
@@ -74,8 +107,6 @@ private:
 	//Xlib Surface Stuff
 	Display *display2 = XOpenDisplay(0);
 
-	Display* display = glfwGetX11Display();
-	Window x11window = glfwGetX11Window(window);
 	int screencount = 0;
 	int screenindex = 0;
 	Screen* screen;
@@ -88,8 +119,6 @@ private:
 	VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
 
 	//Image variables
-	std::vector<VkImage> image = std::vector<VkImage> (1);
-	std::vector<VkImageView> imageview = std::vector<VkImageView> (1);
 	VkImageViewType imageviewtype = VK_IMAGE_VIEW_TYPE_2D;
 	VkComponentMapping componentmapping;
 	VkImageSubresourceRange imagesubresourcerange;
