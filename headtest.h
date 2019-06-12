@@ -5,6 +5,7 @@
 #define GLFW_INCLUDE_VULKAN
 #define GLFW_EXPOSE_NATIVE_X11
 #define VK_USE_PLATFORM_XLIB_KHR
+#define VK_USE_PLATFORM_XCB_KHR
 #include "/usr/include/GLFW/glfw3.h"
 #include "/usr/include/GLFW/glfw3native.h"
 
@@ -29,30 +30,63 @@ struct vkvectors {
 	PFN_vkCreateInstance pfnCreateInstance = (PFN_vkCreateInstance)
     	glfwGetInstanceProcAddress(NULL, "vkCreateInstance");
 
+	Display* glfwdisplay = glfwGetX11Display();
+	Window glfwx11window = glfwGetX11Window(window);
+	VkDisplayKHR display;
+
+	//device creation
 	uint32_t glfwExtensionCount = 2; //assuming it's 2 but use vkEnumerateDeviceExtentionProperties
 	const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 	//int code = glfwGetError(NULL);
 	
-	Display* display = glfwGetX11Display();
-	Window x11window = glfwGetX11Window(window);
-
-	//device creation
+	std::vector<VkExtensionProperties> extensionproperties;
+	//instance extension not device extension
+	std::vector<const char*> extensionvec = {"VK_KHR_surface", "VK_KHR_xlib_surface", "VK_KHR_xcb_surface"};
+	uint32_t extensioncount = static_cast<uint32_t>(extensionvec.size());
 	const char* initextensionname = "VK_KHR_xlib_surface";
 	const char* const* extensionnames = &initextensionname; 
+
 	std::vector<VkPhysicalDevice> physicaldevicevec;
+
+	//device extensions
+	uint32_t deviceextensioncount;
+	std::vector<VkExtensionProperties> deviceextensionproperties;
+	std::vector<const char*> deviceext = {"VK_KHR_swapchain"};
+	uint32_t deviceextcount = static_cast<uint32_t>(deviceext.size());
+
 	//queue variables;
 	std::vector<uint32_t> qfamindex;
+	uint32_t usablequeues = static_cast<uint32_t>(qfamindex.size());
 	std::vector<VkQueue> vkqueue;
 
-	std::vector<VkExtensionProperties> extensionproperties;
 	std::vector<VkCommandBuffer> cmdbuffers;
 
+	//queue variables
+	//VkQueue vkqueue;
+	VkQueueFamilyProperties qfamilystruct;
+	uint32_t familypropertycount;
+	uint32_t queuecountnum;
+	VkDeviceQueueInfo2 queueinfo2;
+	const uint32_t qindexcount = 15;
+
 	//surface
+	VkSurfaceKHR surface;
 	VkSurfaceCapabilitiesKHR surfacecapabilities;
+
+	uint32_t surfaceformatcount;
+	std::vector<VkSurfaceFormatKHR> surfaceformats;
+
+	//swapchaincreation()
+	VkSwapchainKHR swapchain;
 	uint32_t presentmodecount;
-	VkPresentModeKHR presentmode;
+	std::vector<VkPresentModeKHR> presentmode;
+	VkColorSpaceKHR colorspace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+	
+	//imagebuffer
+	VkMemoryRequirements memrequirements;
 
 	//images
+	uint32_t imagecount;
 	std::vector<VkImage> image; 
 	std::vector<VkImageView> imageview;
 };
@@ -80,9 +114,6 @@ public:
 private:
 
 	//==============================================
-	const int Width = 800;
-	const int Height = 600;
-
 
 	VkInstance inst;
 	VkDevice device;
@@ -92,20 +123,10 @@ private:
 
 	uint32_t propertycount;
 
-	//queue variables
-	//VkQueue vkqueue;
-	VkQueueFamilyProperties qfamilystruct;
-	uint32_t familypropertycount;
-	uint32_t queuecountnum;
-	VkDeviceQueueInfo2 queueinfo2;
-	const uint32_t qindexcount = 15;
-	
 	VkCommandBuffer cmdbuffer2;
 
-	VkSurfaceKHR surface;
-
 	//Xlib Surface Stuff
-	Display *display2 = XOpenDisplay(0);
+	Display *xdisplay = XOpenDisplay(0);
 
 	int screencount = 0;
 	int screenindex = 0;
@@ -115,8 +136,6 @@ private:
 	Visual *visualtype;
 	XVisualInfo vinfo;
 	VisualID visualid;
-
-	VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
 
 	//Image variables
 	VkImageViewType imageviewtype = VK_IMAGE_VIEW_TYPE_2D;
@@ -133,6 +152,7 @@ private:
 	void commandbuffers();
 	void surfacecreation();
 	void swapchaincreation();
+	void imagebuffercreation();
 	void imageviewcreation(); 
 
 	void mainloop();
