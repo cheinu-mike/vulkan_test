@@ -321,17 +321,19 @@ void vulkantest::surfacecreation(){
 	surfaceinfo.dpy = vkinfo->glfwdisplay;
 	surfaceinfo.window = vkinfo->glfwx11window;
 
+	/*
 	VkXcbSurfaceCreateInfoKHR xcbsurfaceinfo = {};
 	xcbsurfaceinfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
 	xcbsurfaceinfo.pNext = NULL;
 	xcbsurfaceinfo.flags = 0;
 	//xcbsurfaceinfo.connection = ;
 	//xcbsurfaceinfo.window = ;
+	*/
 
-	VkResult surfaceresult2 = glfwCreateWindowSurface(inst, vkinfo->window, nullptr, &vkinfo->surface);
-	//VkResult surfaceresult = vkCreateXlibSurfaceKHR(inst, &surfaceinfo, nullptr, &vkinfo->surface);
+	VkResult surfaceresult = vkCreateXlibSurfaceKHR(inst, &surfaceinfo, nullptr, &vkinfo->surface);
+	VkResult surfaceresult2 = glfwCreateWindowSurface(inst, vkinfo->window, nullptr, &vkinfo->surface2);
 
-	//testresult(surfaceresult, "x11 surface creation");
+	testresult(surfaceresult, "x11 surface creation");
 	testresult(surfaceresult2, "glfw surface creation");
 	
 	std::cout << "\n";
@@ -339,20 +341,20 @@ void vulkantest::surfacecreation(){
 
 void vulkantest::swapchaincreation(){
 	
-	VkResult surcapres = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicaldevice, vkinfo->surface, &vkinfo->surfacecapabilities);
+	VkResult surcapres = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicaldevice, vkinfo->surface2, &vkinfo->surfacecapabilities);
 	testresult(surcapres, "surface capabilities creation");
 	
-	vkGetPhysicalDeviceSurfacePresentModesKHR(physicaldevice, vkinfo->surface, &vkinfo->presentmodecount, nullptr);
+	vkGetPhysicalDeviceSurfacePresentModesKHR(physicaldevice, vkinfo->surface2, &vkinfo->presentmodecount, nullptr);
 	std::cout << "number of present mode count: " << vkinfo->presentmodecount << std::endl;
 
 	vkinfo->presentmode.resize(vkinfo->presentmodecount);
-	VkResult surpresres = vkGetPhysicalDeviceSurfacePresentModesKHR(physicaldevice, vkinfo->surface, &vkinfo->presentmodecount, vkinfo->presentmode.data());
+	VkResult surpresres = vkGetPhysicalDeviceSurfacePresentModesKHR(physicaldevice, vkinfo->surface2, &vkinfo->presentmodecount, vkinfo->presentmode.data());
 	testresult(surpresres, "surface present mode creation");
    		
 	//FIX LATER
-	vkGetPhysicalDeviceSurfaceFormatsKHR(physicaldevice, vkinfo->surface, &vkinfo->surfaceformatcount, NULL); 
+	vkGetPhysicalDeviceSurfaceFormatsKHR(physicaldevice, vkinfo->surface2, &vkinfo->surfaceformatcount, NULL); 
 	vkinfo->surfaceformats.resize(vkinfo->surfaceformatcount);
-	VkResult surformatres = vkGetPhysicalDeviceSurfaceFormatsKHR(physicaldevice, vkinfo->surface, &vkinfo->surfaceformatcount, vkinfo->surfaceformats.data()); 
+	VkResult surformatres = vkGetPhysicalDeviceSurfaceFormatsKHR(physicaldevice, vkinfo->surface2, &vkinfo->surfaceformatcount, vkinfo->surfaceformats.data()); 
 	std::cout << "Number of formats: " << vkinfo->surfaceformatcount << std::endl;
 
 	for (uint32_t i=0; i < vkinfo->surfaceformatcount; i++){
@@ -365,21 +367,20 @@ void vulkantest::swapchaincreation(){
 	VkSwapchainCreateInfoKHR swapcreate = {};
 	swapcreate.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	swapcreate.pNext = NULL;
-	swapcreate.surface = vkinfo->surface;
+	swapcreate.surface = vkinfo->surface2;
 	swapcreate.minImageCount = vkinfo->surfacecapabilities.minImageCount;
 	swapcreate.imageFormat = vkinfo->surfaceformats[1].format;
 	swapcreate.imageColorSpace = vkinfo->surfaceformats[1].colorSpace;
-	swapcreate.imageExtent.width = vkinfo->Width;
-	swapcreate.imageExtent.height = vkinfo->Height;
+	swapcreate.imageExtent= vkinfo->surfacecapabilities.currentExtent;
 	swapcreate.imageArrayLayers = vkinfo->surfacecapabilities.maxImageArrayLayers - 1;
-	//swapcreate.imageUsage = ;
+	swapcreate.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 	swapcreate.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
 	swapcreate.queueFamilyIndexCount = vkinfo->usablequeues;
 	swapcreate.pQueueFamilyIndices = vkinfo->qfamindex.data();
-	//swapcreate.preTransform = vkinfo->surfacecapabilities.supportedTransforms;
-	//swapcreate.compositeAlpha = vkinfo->surfacecapabilities.supportedCompositeAlpha;
+	swapcreate.preTransform = vkinfo->surfacecapabilities.currentTransform;
+	swapcreate.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	swapcreate.presentMode = vkinfo->presentmode[1];
-	//swapcreate.clipped = ;
+	swapcreate.clipped = VK_TRUE;
 	swapcreate.oldSwapchain = VK_NULL_HANDLE;
 	
 	VkResult result = vkCreateSwapchainKHR(device, &swapcreate, NULL, &vkinfo->swapchain);

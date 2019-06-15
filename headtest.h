@@ -71,6 +71,7 @@ struct vkvectors {
 
 	//surface
 	VkSurfaceKHR surface;
+	VkSurfaceKHR surface2;
 	VkSurfaceCapabilitiesKHR surfacecapabilities;
 
 	uint32_t surfaceformatcount;
