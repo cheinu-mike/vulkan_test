@@ -52,16 +52,14 @@ struct vkvectors {
 	uint32_t deviceextcount = static_cast<uint32_t>(deviceext.size());
 
 	//queue variables;
-	std::vector<uint32_t> qfamindex; //vector of graphical bit queue family index
-	uint32_t usablequeues; // = static_cast<uint32_t>(qfamindex.size());
+	std::vector<uint32_t> qfamindex; 	//vector of graphical bit queue family index
+	uint32_t usablequeues; 				// = static_cast<uint32_t>(qfamindex.size());
 	std::vector<VkQueue> vkqueue;
-
-	std::vector<VkCommandBuffer> cmdbuffers;
-
-	//VkQueue vkqueue;
-	VkQueueFamilyProperties qfamilystruct;
+	std::vector<VkQueueFamilyProperties> qfamilypropertystruct;
 	uint32_t familypropertycount;
 	VkDeviceQueueInfo2 queueinfo2;
+
+	std::vector<VkCommandBuffer> cmdbuffers;
 
 	//surface
 	VkSurfaceKHR surface;

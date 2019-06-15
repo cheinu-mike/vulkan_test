@@ -189,13 +189,14 @@ void vulkantest::devicestructs(){
 	}
 
 	vkGetPhysicalDeviceQueueFamilyProperties(physicaldevice, &vkinfo->familypropertycount, nullptr);
-	std::cout << "familypropertycount: " << vkinfo->familypropertycount << std::endl;
-	vkGetPhysicalDeviceQueueFamilyProperties(physicaldevice, &vkinfo->familypropertycount, &vkinfo->qfamilystruct);
-	std::cout << "family property count: " << vkinfo->familypropertycount << std::endl;
-	std::cout << "family struct queueflags: " << vkinfo->qfamilystruct.queueFlags << std::endl;
-	std::cout << "family struct queuecount: " << vkinfo->qfamilystruct.queueCount << std::endl;
+	std::cout << "queue familypropertycount: " << vkinfo->familypropertycount << std::endl;
+	vkinfo->qfamilypropertystruct.resize(vkinfo->familypropertycount);
+	vkGetPhysicalDeviceQueueFamilyProperties(physicaldevice, &vkinfo->familypropertycount, vkinfo->qfamilypropertystruct.data());
+	std::cout << "queue family property count: " << vkinfo->familypropertycount << std::endl;
+	std::cout << "queue family struct queueflags: " << vkinfo->qfamilypropertystruct[0].queueFlags << std::endl;
+	std::cout << "queue family struct queuecount: " << vkinfo->qfamilypropertystruct[0].queueCount << std::endl;
 	
-	if (vkinfo->qfamilystruct.queueFlags & VK_QUEUE_GRAPHICS_BIT){
+	if (vkinfo->qfamilypropertystruct[0].queueFlags & VK_QUEUE_GRAPHICS_BIT){
 			std::cout << "graphics bit success" << std::endl;
 	}
 	else {
@@ -237,6 +238,8 @@ void vulkantest::devicestructs(){
 					qcreateinfo[i].queueFamilyIndex = i; 
 					qcreateinfo[i].queueCount = vkinfo->usablequeues;
 					qcreateinfo[i].pQueuePriorities = qpriorities;
+
+					//vkGetDeviceQueue(device, i, 
 	}
 	/*
 	for (std::size_t i = 0; vkinfo->qfamindex.size(); i++){
