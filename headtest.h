@@ -27,9 +27,6 @@ struct vkvectors {
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const char* monitorname;
 
-	PFN_vkCreateInstance pfnCreateInstance = (PFN_vkCreateInstance)
-    	glfwGetInstanceProcAddress(NULL, "vkCreateInstance");
-
 	Display* glfwdisplay = glfwGetX11Display();
 	Window glfwx11window = glfwGetX11Window(window);
 	VkDisplayKHR display;
@@ -55,19 +52,16 @@ struct vkvectors {
 	uint32_t deviceextcount = static_cast<uint32_t>(deviceext.size());
 
 	//queue variables;
-	std::vector<uint32_t> qfamindex;
-	uint32_t usablequeues = static_cast<uint32_t>(qfamindex.size());
+	std::vector<uint32_t> qfamindex; //vector of graphical bit queue family index
+	uint32_t usablequeues; // = static_cast<uint32_t>(qfamindex.size());
 	std::vector<VkQueue> vkqueue;
 
 	std::vector<VkCommandBuffer> cmdbuffers;
 
-	//queue variables
 	//VkQueue vkqueue;
 	VkQueueFamilyProperties qfamilystruct;
 	uint32_t familypropertycount;
-	uint32_t queuecountnum;
 	VkDeviceQueueInfo2 queueinfo2;
-	const uint32_t qindexcount = 15;
 
 	//surface
 	VkSurfaceKHR surface;
@@ -81,7 +75,6 @@ struct vkvectors {
 	VkSwapchainKHR swapchain;
 	uint32_t presentmodecount;
 	std::vector<VkPresentModeKHR> presentmode;
-	VkColorSpaceKHR colorspace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
 	
 	//imagebuffer
 	VkMemoryRequirements memrequirements;

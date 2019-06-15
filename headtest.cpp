@@ -219,19 +219,25 @@ void vulkantest::devicestructs(){
 			if (vkGetPhysicalDeviceXlibPresentationSupportKHR(physicaldevice, i, vkinfo->glfwdisplay, visualid) == VK_TRUE){
 					std::cout << "queue family index supported: " << i << std::endl;
 					vkinfo->qfamindex.push_back(i);
-					qcreateinfo.resize(i+1);
+			}
+			else{
+					std::cout << "queue family index " << i << " does not support Xlib" << std::endl;
+			}
+	}
+
+	vkinfo->usablequeues = static_cast<uint32_t>(vkinfo->qfamindex.size());
+	std::cout << vkinfo->usablequeues << std::endl;
+	qcreateinfo.resize(vkinfo->usablequeues); 
+
+	for (uint32_t i = 0; i < vkinfo->usablequeues; i++){
+
 					qcreateinfo[i].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 					qcreateinfo[i].pNext = NULL;
 					qcreateinfo[i].flags = 0;
 					qcreateinfo[i].queueFamilyIndex = i; 
-					qcreateinfo[i].queueCount = vkinfo->queuecountnum;
+					qcreateinfo[i].queueCount = vkinfo->usablequeues;
 					qcreateinfo[i].pQueuePriorities = qpriorities;
-			}
-			else{
-					std::cout << "queue index " << i << " does not support Xlib" << std::endl;
-			}
 	}
-
 	/*
 	for (std::size_t i = 0; vkinfo->qfamindex.size(); i++){
 		vkGetDeviceQueue(device, vkinfo->qfamindex[i], 0, vkinfo->vkqueue.data());
@@ -247,7 +253,7 @@ void vulkantest::devicestructs(){
 	VkDeviceCreateInfo deviceinfo = {};
 	deviceinfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	deviceinfo.pNext = NULL;
-	deviceinfo.queueCreateInfoCount = vkinfo->familypropertycount;
+	deviceinfo.queueCreateInfoCount = vkinfo->usablequeues;
 	deviceinfo.pQueueCreateInfos = qcreateinfo.data();
 	deviceinfo.enabledExtensionCount = vkinfo->deviceextcount;
 	deviceinfo.ppEnabledExtensionNames = vkinfo->deviceext.data();
