@@ -3,3 +3,6 @@
 *.swp
 ignore.cpp
 vktest
+vulkanapp.cpp
+vulkanapp.h
+main.cpp
