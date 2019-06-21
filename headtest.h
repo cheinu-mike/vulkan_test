@@ -53,6 +53,7 @@ struct vkvectors {
 
 	//queue variables;
 	std::vector<uint32_t> qfamindex; 	//vector of graphical bit queue family index
+	std::vector<uint32_t> qfamgraphicsbitindex;
 	uint32_t usablequeues; 				// = static_cast<uint32_t>(qfamindex.size());
 	std::vector<VkQueue> vkqueue;
 	std::vector<VkQueueFamilyProperties> qfamilypropertystruct;

@@ -196,13 +196,19 @@ void vulkantest::devicestructs(){
 	std::cout << "queue family struct queueflags: " << vkinfo->qfamilypropertystruct[0].queueFlags << std::endl;
 	std::cout << "queue family struct queuecount: " << vkinfo->qfamilypropertystruct[0].queueCount << std::endl;
 	
-	if (vkinfo->qfamilypropertystruct[0].queueFlags & VK_QUEUE_GRAPHICS_BIT){
-			std::cout << "graphics bit success" << std::endl;
-	}
-	else {
-			std::cout << "what are you doing?" << std::endl;
-	}
+	for (uint32_t i = 0; i < vkinfo->familypropertycount; i++){
 
+		if (vkinfo->qfamilypropertystruct[i].queueFlags & VK_QUEUE_GRAPHICS_BIT){
+			std::cout << "graphics bit success" << std::endl;
+		}
+		else if (vkinfo->qfamilypropertystruct[i].queueFlags & VK_QUEUE_TRANSFER_BIT){
+			std::cout << "Queue family " << i << " is a transfer bit" << std::endl;
+		}
+		else {
+			std::cout << "what are you doing?" << std::endl;
+		}
+
+	}
 	float qpriorities[1] = {0.5};
 	std::vector<VkDeviceQueueCreateInfo> qcreateinfo = {};
 
@@ -218,11 +224,11 @@ void vulkantest::devicestructs(){
 
 	for (uint32_t i=0; i < vkinfo->familypropertycount; i++){
 			if (vkGetPhysicalDeviceXlibPresentationSupportKHR(physicaldevice, i, vkinfo->glfwdisplay, visualid) == VK_TRUE){
-					std::cout << "queue family index supported: " << i << std::endl;
+					std::cout << "queue family index: " << i << " supports Xlib" << std::endl;
 					vkinfo->qfamindex.push_back(i);
 			}
 			else{
-					std::cout << "queue family index " << i << " does not support Xlib" << std::endl;
+					std::cout << "queue family index: " << i << " does not support Xlib" << std::endl;
 			}
 	}
 
@@ -350,9 +356,11 @@ void vulkantest::surfacecreation(){
 
 void vulkantest::swapchaincreation(){
 	
+	//surface capabilities
 	VkResult surcapres = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicaldevice, vkinfo->surface2, &vkinfo->surfacecapabilities);
 	testresult(surcapres, "surface capabilities creation");
-	
+
+	//present mode	
 	vkGetPhysicalDeviceSurfacePresentModesKHR(physicaldevice, vkinfo->surface2, &vkinfo->presentmodecount, nullptr);
 	std::cout << "number of present mode count: " << vkinfo->presentmodecount << std::endl;
 
@@ -360,7 +368,7 @@ void vulkantest::swapchaincreation(){
 	VkResult surpresres = vkGetPhysicalDeviceSurfacePresentModesKHR(physicaldevice, vkinfo->surface2, &vkinfo->presentmodecount, vkinfo->presentmode.data());
 	testresult(surpresres, "surface present mode creation");
    		
-	//FIX LATER
+	//surface formats
 	vkGetPhysicalDeviceSurfaceFormatsKHR(physicaldevice, vkinfo->surface2, &vkinfo->surfaceformatcount, NULL); 
 	vkinfo->surfaceformats.resize(vkinfo->surfaceformatcount);
 	VkResult surformatres = vkGetPhysicalDeviceSurfaceFormatsKHR(physicaldevice, vkinfo->surface2, &vkinfo->surfaceformatcount, vkinfo->surfaceformats.data()); 
@@ -373,6 +381,10 @@ void vulkantest::swapchaincreation(){
 
 	testresult(surformatres, "Device surface format creation");
 	
+	std::cout << "surface format min imagecount " << vkinfo->surfacecapabilities.minImageCount << std::endl;
+	std::cout << "Present mode " << vkinfo->presentmode[0] << std::endl;
+	std::cout << "Present mode " << vkinfo->presentmode[1] << std::endl;
+	std::cout << "Present mode " << vkinfo->presentmode[2] << std::endl;
 	VkSwapchainCreateInfoKHR swapcreate = {};
 	swapcreate.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	swapcreate.pNext = NULL;
@@ -383,9 +395,9 @@ void vulkantest::swapchaincreation(){
 	swapcreate.imageExtent= vkinfo->surfacecapabilities.currentExtent;
 	swapcreate.imageArrayLayers = vkinfo->surfacecapabilities.maxImageArrayLayers - 1;
 	swapcreate.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-	swapcreate.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-	swapcreate.queueFamilyIndexCount = vkinfo->usablequeues;
-	swapcreate.pQueueFamilyIndices = vkinfo->qfamindex.data();
+	swapcreate.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE; //VK_SHARING_MODE_CONCURRENT;
+	swapcreate.queueFamilyIndexCount = 0; //fix later must be graphics bit queue
+	swapcreate.pQueueFamilyIndices = NULL; //must be graphics bit queue 
 	swapcreate.preTransform = vkinfo->surfacecapabilities.currentTransform;
 	swapcreate.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	swapcreate.presentMode = vkinfo->presentmode[1];
