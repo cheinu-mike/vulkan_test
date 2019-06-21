@@ -436,7 +436,7 @@ void vulkantest::imagecreation(){
 	VkImageCreateInfo imagecreateinfo = {}; 
 	imagecreateinfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	imagecreateinfo.pNext = NULL;
-	imagecreateinfo.imageType = VK_IMAGE_VIEW_TYPE_2D;
+	imagecreateinfo.imageType = VK_IMAGE_TYPE_2D;
 }
 
 void vulkantest::imageviewcreation(){
