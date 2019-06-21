@@ -146,6 +146,7 @@ private:
 	void surfacecreation();
 	void swapchaincreation();
 	void imagebuffercreation();
+	void imagecreation();
 	void imageviewcreation(); 
 
 	void mainloop();

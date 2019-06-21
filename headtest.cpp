@@ -409,7 +409,7 @@ void vulkantest::swapchaincreation(){
 	swapcreate.imageArrayLayers = vkinfo->surfacecapabilities.maxImageArrayLayers;
 	swapcreate.imageUsage = vkinfo->surfacecapabilities.supportedUsageFlags;
 	swapcreate.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE; //VK_SHARING_MODE_CONCURRENT;
-	swapcreate.queueFamilyIndexCount = 0; //fix later must be graphics bit queue
+	swapcreate.queueFamilyIndexCount = 0; //fix later must be graphics and present bit queue. set to zero if it is already initialized?
 	swapcreate.pQueueFamilyIndices = NULL; //must be graphics bit queue 
 	swapcreate.preTransform = vkinfo->surfacecapabilities.currentTransform;
 	swapcreate.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
@@ -430,6 +430,13 @@ void vulkantest::swapchaincreation(){
 
 void vulkantest::imagebuffercreation(){
 		vkGetImageMemoryRequirements(device, vkinfo->image[0], &vkinfo->memrequirements);
+}
+
+void vulkantest::imagecreation(){
+	VkImageCreateInfo imagecreateinfo = {}; 
+	imagecreateinfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	imagecreateinfo.pNext = NULL;
+	imagecreateinfo.imageType = VK_IMAGE_VIEW_TYPE_2D;
 }
 
 void vulkantest::imageviewcreation(){
