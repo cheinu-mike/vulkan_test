@@ -112,10 +112,14 @@ void vulkantest::createinstance(){
 	std::cout <<  vkinfo->extensionproperties.size() << std::endl;
 
 	vkEnumerateInstanceExtensionProperties(NULL, &propertycount, vkinfo->extensionproperties.data());
+
+	//Prints Instance extensions
+	/*
 	for (uint32_t i; i < propertycount; i++){
 		std::cout << vkinfo->extensionproperties[i].extensionName << std::endl;
 	}
-	
+	*/	
+
 	VkInstanceCreateInfo instanceCI = {};
 	instanceCI.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	instanceCI.pNext = NULL;
@@ -184,9 +188,12 @@ void vulkantest::devicestructs(){
 
 	std::cout << "device extension count: " << vkinfo->deviceextensioncount << std::endl;
 
+	//Prints extension names for device
+	/*
 	for (uint32_t i; i < vkinfo->deviceextensioncount; i++){
 		std::cout << vkinfo->deviceextensionproperties[i].extensionName << std::endl;
 	}
+	*/
 
 	vkGetPhysicalDeviceQueueFamilyProperties(physicaldevice, &vkinfo->familypropertycount, nullptr);
 	std::cout << "queue familypropertycount: " << vkinfo->familypropertycount << std::endl;
@@ -381,10 +388,16 @@ void vulkantest::swapchaincreation(){
 
 	testresult(surformatres, "Device surface format creation");
 	
-	std::cout << "surface format min imagecount " << vkinfo->surfacecapabilities.minImageCount << std::endl;
+	std::cout << "surface min imagecount " << vkinfo->surfacecapabilities.minImageCount << std::endl;
+	std::cout << "surface max imagecount " << vkinfo->surfacecapabilities.maxImageCount << std::endl;
 	std::cout << "Present mode " << vkinfo->presentmode[0] << std::endl;
 	std::cout << "Present mode " << vkinfo->presentmode[1] << std::endl;
 	std::cout << "Present mode " << vkinfo->presentmode[2] << std::endl;
+	std::cout << "surface formats " << vkinfo->surfaceformats[0].format << std::endl;
+	//std::cout << "image extent count " << vkinfo->surfacecapabilities.currentExtent << std::endl;
+	std::cout << "image array layers (must be greater than 0) " << vkinfo->surfacecapabilities.maxImageArrayLayers << std::endl;
+
+	std::cout << "surface usage flag " << vkinfo->surfacecapabilities.supportedUsageFlags << std::endl;
 	VkSwapchainCreateInfoKHR swapcreate = {};
 	swapcreate.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	swapcreate.pNext = NULL;
@@ -393,14 +406,14 @@ void vulkantest::swapchaincreation(){
 	swapcreate.imageFormat = vkinfo->surfaceformats[1].format;
 	swapcreate.imageColorSpace = vkinfo->surfaceformats[1].colorSpace;
 	swapcreate.imageExtent= vkinfo->surfacecapabilities.currentExtent;
-	swapcreate.imageArrayLayers = vkinfo->surfacecapabilities.maxImageArrayLayers - 1;
-	swapcreate.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	swapcreate.imageArrayLayers = vkinfo->surfacecapabilities.maxImageArrayLayers;
+	swapcreate.imageUsage = vkinfo->surfacecapabilities.supportedUsageFlags;
 	swapcreate.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE; //VK_SHARING_MODE_CONCURRENT;
 	swapcreate.queueFamilyIndexCount = 0; //fix later must be graphics bit queue
 	swapcreate.pQueueFamilyIndices = NULL; //must be graphics bit queue 
 	swapcreate.preTransform = vkinfo->surfacecapabilities.currentTransform;
 	swapcreate.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-	swapcreate.presentMode = vkinfo->presentmode[1];
+	swapcreate.presentMode = vkinfo->presentmode[0];
 	swapcreate.clipped = VK_TRUE;
 	swapcreate.oldSwapchain = VK_NULL_HANDLE;
 	
@@ -409,7 +422,7 @@ void vulkantest::swapchaincreation(){
 	testresult(result, "swapchain creation");
 
 	vkGetSwapchainImagesKHR(device, vkinfo->swapchain, &vkinfo->imagecount, NULL);
-	std::cout << " Number of swapchain images: " << vkinfo->imagecount << std::endl;
+	std::cout << "Number of swapchain images: " << vkinfo->imagecount << std::endl;
 	vkinfo->image.resize(vkinfo->imagecount);
 	std::cout << "\n";	
 	
