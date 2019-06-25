@@ -143,8 +143,6 @@ void vulkantest::createinstance(){
 
 	std::cout << "Enabled extention count: " << instanceCI.enabledExtensionCount << std::endl;
 
-	//std::cout << "glfwgeterror: " << code << std::endl;
-
 	testresult(resultinstance, "instance creation");
 
 	std::cout << "\n";
@@ -437,6 +435,8 @@ void vulkantest::imagecreation(){
 	imagecreateinfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	imagecreateinfo.pNext = NULL;
 	imagecreateinfo.imageType = VK_IMAGE_TYPE_2D;
+	imagecreateinfo.format = VK_FORMAT_D16_UNORM;
+	//imagecreateinfo.extent = ;
 }
 
 void vulkantest::imageviewcreation(){
