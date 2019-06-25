@@ -217,16 +217,6 @@ void vulkantest::devicestructs(){
 	float qpriorities[1] = {0.5};
 	std::vector<VkDeviceQueueCreateInfo> qcreateinfo = {};
 
-	/*
-	VkDeviceQueueCreateInfo qcreateinfo = {};
-	qcreateinfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	qcreateinfo.pNext = NULL;
-	qcreateinfo.flags = 0;
-	qcreateinfo.queueFamilyIndex = 0; //create function that will find the appropritate queue family
-	qcreateinfo.queueCount = vkinfo->queuecountnum;
-	qcreateinfo.pQueuePriorities = qpriorities;
-	*/
-
 	for (uint32_t i=0; i < vkinfo->familypropertycount; i++){
 		  vkinfo->glfwdisplay = glfwGetX11Display();
 			if (vkGetPhysicalDeviceXlibPresentationSupportKHR(physicaldevice, i, vkinfo->glfwdisplay, visualid) == VK_TRUE){
@@ -259,11 +249,6 @@ void vulkantest::devicestructs(){
 		//vkGetDeviceQueue(device, 0, 0, vkinfo->vkqueue.data());
 	}
 	*/
-
-	//vkGetDeviceQueue2(device, &queueinfo2, &vkqueue);
-	//get some more info on queue2;
-	//std::cout << "queueinfo2.queueFamilyIndex: " << queueinfo2.queueFamilyIndex << std::endl;
-	//std::cout << "queueinfo2.queueIndex: " << queueinfo2.queueIndex << std::endl;
 
 	VkDeviceCreateInfo deviceinfo = {};
 	deviceinfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -319,7 +304,6 @@ void vulkantest::commandbuffers(){
 	begininfo.pNext = NULL;
 	begininfo.flags = 0;
 
-	//segfaulting with the VkCommandBuffer vector bullshit
 	//VkResult begincmdbuff = vkBeginCommandBuffer(cmdbuffers[0], &begininfo);
 
 	//testresult(begincmdbuff, "vk begin command buffer thing");
