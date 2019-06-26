@@ -19,6 +19,12 @@ struct vkvectors {
 	const int Width = 800;
 	const int Height = 400;
 
+	//Validation Layers
+	uint32_t defaultlayercount;
+	std::vector<VkLayerProperties> layerproperties;
+	std::vector<const char*> validationlayers = {"VK_LAYER_LUNARG_standard_validation"};
+	uint32_t layercount = static_cast<uint32_t>(validationlayers.size());
+
 	//xlib stuff
 	int initcount = 0;	
 	int* monitorcount = &initcount;
@@ -38,7 +44,7 @@ struct vkvectors {
 	
 	std::vector<VkExtensionProperties> extensionproperties;
 	//instance extension not device extension
-	std::vector<const char*> extensionvec = {"VK_KHR_surface", "VK_KHR_xlib_surface", "VK_KHR_xcb_surface"};
+	std::vector<const char*> extensionvec = {"VK_KHR_surface", "VK_KHR_xlib_surface", "VK_KHR_xcb_surface", "VK_EXT_debug_report"};
 	uint32_t extensioncount = static_cast<uint32_t>(extensionvec.size());
 	const char* initextensionname = "VK_KHR_xlib_surface";
 	const char* const* extensionnames = &initextensionname; 

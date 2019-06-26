@@ -114,19 +114,27 @@ void vulkantest::createinstance(){
 	vkEnumerateInstanceExtensionProperties(NULL, &propertycount, vkinfo->extensionproperties.data());
 
 	//Prints Instance extensions
-	/*
-	for (uint32_t i; i < propertycount; i++){
+	for (uint32_t i = 0; i < propertycount; i++){
+
 		std::cout << vkinfo->extensionproperties[i].extensionName << std::endl;
 	}
-	*/
+	
+	vkEnumerateInstanceLayerProperties(&vkinfo->defaultlayercount, NULL); 
+	vkinfo->layerproperties.resize(vkinfo->defaultlayercount);
+	vkEnumerateInstanceLayerProperties(&vkinfo->defaultlayercount, vkinfo->layerproperties.data());
+
+	for (uint32_t i = 0; i < vkinfo->defaultlayercount; i++){
+		std::cout << "\t" << vkinfo->layerproperties[i].layerName << std::endl;
+		std::cout << vkinfo->layerproperties[i].description << std::endl;
+	}
 
 	VkInstanceCreateInfo instanceCI = {};
 	instanceCI.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	instanceCI.pNext = NULL;
 	//instanceCI.flags
 	instanceCI.pApplicationInfo = &appinfo;
-	instanceCI.enabledLayerCount = 0;
-	//instanceCI.ppEnabledLayerNames
+	instanceCI.enabledLayerCount = vkinfo->layercount;
+	instanceCI.ppEnabledLayerNames = vkinfo->validationlayers.data();
 
 	std::cout << "enabled glfw extension count: "<< vkinfo->glfwExtensionCount << std::endl;
 
