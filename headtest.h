@@ -44,7 +44,7 @@ struct vkvectors {
 	
 	std::vector<VkExtensionProperties> extensionproperties;
 	//instance extension not device extension
-	std::vector<const char*> extensionvec = {"VK_KHR_surface", "VK_KHR_xlib_surface", "VK_KHR_xcb_surface", "VK_EXT_debug_report"};
+	std::vector<const char*> extensionvec = {"VK_KHR_surface", "VK_KHR_xlib_surface", "VK_KHR_xcb_surface", "VK_EXT_debug_report", "VK_EXT_debug_utils"};
 	uint32_t extensioncount = static_cast<uint32_t>(extensionvec.size());
 	const char* initextensionname = "VK_KHR_xlib_surface";
 	const char* const* extensionnames = &initextensionname; 
@@ -147,6 +147,7 @@ private:
 	void getxlib();
 
 	void createinstance();
+	void validationdebug();
 	void devicestructs();
 	void commandbuffers();
 	void surfacecreation();
