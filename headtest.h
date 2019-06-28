@@ -14,7 +14,7 @@
 #include <vector>
 #include <X11/Xlib.h>
 
-struct vkvectors {
+struct vkvariables{
 		
 	const int Width = 800;
 	const int Height = 400;
@@ -22,6 +22,11 @@ struct vkvectors {
 	VkInstance inst;
 
 	//Validation Layers
+	//***?????????
+	//PFN_vkCreateDebugReportCallbackEXT CreateDebugReportCallback = VK_NULL_HANDLE;
+	//CreateDebugReportCallback = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT");
+	//***?????????
+
 	uint32_t defaultlayercount;
 	std::vector<VkLayerProperties> layerproperties;
 	std::vector<const char*> validationlayers = {"VK_LAYER_LUNARG_standard_validation"};
@@ -106,7 +111,7 @@ class vulkantest {
 public:
 	
 	//vkvectors* vkinfo = (vkvectors*)(malloc(sizeof(vkvectors)));
-	vkvectors* vkinfo = new vkvectors;
+	vkvariables* vkinfo = new vkvariables;
 
 	bool testresult(VkResult result, std::string fname){
 		if (result == VK_SUCCESS){
