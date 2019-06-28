@@ -159,11 +159,6 @@ void vulkantest::createinstance(){
 
 void vulkantest::validationdebug(){
 
-	typedef VkBool32 (VKAPI_PTR *PFN_vkDebugUtilsMessengerCallbackEXT)(
-    	VkDebugUtilsMessageSeverityFlagBitsEXT           messageSeverity,
-		VkDebugUtilsMessageTypeFlagsEXT                  messageTypes,
-		const VkDebugUtilsMessengerCallbackDataEXT*      pCallbackData,
-		void*                                            pUserData) = vkinfo->debugCallback;
 	//PFN_vkDebugUtilsMessengerCallbackEXT usercallback = vkinfo->debugCallback;
 
 	VkDebugUtilsMessengerCreateInfoEXT debuginfo = {};

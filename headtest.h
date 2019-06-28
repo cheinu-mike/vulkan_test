@@ -25,11 +25,14 @@ struct vkvectors {
 	std::vector<const char*> validationlayers = {"VK_LAYER_LUNARG_standard_validation"};
 	uint32_t layercount = static_cast<uint32_t>(validationlayers.size());
 
-	VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
+	//VKAPI_ATTR VkBool32 VKAPI_CALL 
+	PFN_vkDebugUtilsMessengerCallbackEXT debugCallback;
+	/*(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 	{
 		std::cout << "Validation Layer: " << pCallbackData->pMessage << std::endl;
 		return VK_FALSE;
 	}
+	*/
 
 	//xlib stuff
 	int initcount = 0;	
