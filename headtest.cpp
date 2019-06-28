@@ -159,15 +159,19 @@ void vulkantest::createinstance(){
 
 void vulkantest::validationdebug(){
 
-	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData){
-		std::cout << "Validation Layer: " << pCallbackData->pMessage << std::endl;
-	}
+	typedef VkBool32 (VKAPI_PTR *PFN_vkDebugUtilsMessengerCallbackEXT)(
+    	VkDebugUtilsMessageSeverityFlagBitsEXT           messageSeverity,
+		VkDebugUtilsMessageTypeFlagsEXT                  messageTypes,
+		const VkDebugUtilsMessengerCallbackDataEXT*      pCallbackData,
+		void*                                            pUserData) = vkinfo->debugCallback;
+	//PFN_vkDebugUtilsMessengerCallbackEXT usercallback = vkinfo->debugCallback;
+
 	VkDebugUtilsMessengerCreateInfoEXT debuginfo = {};
 	debuginfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 	debuginfo.flags = 0;
 	debuginfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 	debuginfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-	debuginfo.pfnUserCallback = debugCallback;
+	debuginfo.pfnUserCallback = vkinfo->debugCallback;
 	//debuginfo.pUserData = ;
 
 }
