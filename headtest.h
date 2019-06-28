@@ -19,11 +19,14 @@ struct vkvectors {
 	const int Width = 800;
 	const int Height = 400;
 
+	VkInstance inst;
+
 	//Validation Layers
 	uint32_t defaultlayercount;
 	std::vector<VkLayerProperties> layerproperties;
 	std::vector<const char*> validationlayers = {"VK_LAYER_LUNARG_standard_validation"};
 	uint32_t layercount = static_cast<uint32_t>(validationlayers.size());
+	VkDebugUtilsMessengerEXT messenger;
 
 	//VKAPI_ATTR VkBool32 VKAPI_CALL 
 	PFN_vkDebugUtilsMessengerCallbackEXT debugCallback;
@@ -123,7 +126,6 @@ private:
 
 	//==============================================
 
-	VkInstance inst;
 	VkDevice device;
 	uint32_t devicecount = 0;
 	VkPhysicalDevice physicaldevice = VK_NULL_HANDLE;

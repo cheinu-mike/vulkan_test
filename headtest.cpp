@@ -148,7 +148,7 @@ void vulkantest::createinstance(){
 		instanceCI.ppEnabledExtensionNames = vkinfo->extensionvec.data();
 	}
 
-	VkResult resultinstance = vkCreateInstance(&instanceCI, NULL, &inst);
+	VkResult resultinstance = vkCreateInstance(&instanceCI, NULL, &vkinfo->inst);
 
 	std::cout << "Enabled extention count: " << instanceCI.enabledExtensionCount << std::endl;
 
@@ -169,11 +169,14 @@ void vulkantest::validationdebug(){
 	debuginfo.pfnUserCallback = vkinfo->debugCallback;
 	//debuginfo.pUserData = ;
 
+	VkResult debugresult = vkCreateDebugUtilsMessengerEXT(vkinfo->inst, &debuginfo, nullptr, &vkinfo->messenger); 
+
+	testresult(debugresult, "validation layer creation");
 }
 
 void vulkantest::devicestructs(){
 
-	VkResult holder = vkEnumeratePhysicalDevices(inst, &devicecount, nullptr); //puts a number into devicecount
+	VkResult holder = vkEnumeratePhysicalDevices(vkinfo->inst, &devicecount, nullptr); //puts a number into devicecount
 
 	if (holder == VK_SUCCESS) {
 		std::cout << "Physical Device Enumeration is a success" << std::endl;
@@ -188,7 +191,7 @@ void vulkantest::devicestructs(){
 	}
 
 
-	VkResult holder2 = vkEnumeratePhysicalDevices(inst, &devicecount, &physicaldevice);
+	VkResult holder2 = vkEnumeratePhysicalDevices(vkinfo->inst, &devicecount, &physicaldevice);
 
 	if (holder2 == VK_SUCCESS) {
 		std::cout << "Physical Device Enumeration2 is a success" << std::endl;
@@ -358,8 +361,8 @@ void vulkantest::surfacecreation(){
 	//xcbsurfaceinfo.window = ;
 	*/
 
-	VkResult surfaceresult = vkCreateXlibSurfaceKHR(inst, &surfaceinfo, nullptr, &vkinfo->surface);
-	VkResult surfaceresult2 = glfwCreateWindowSurface(inst, vkinfo->window, nullptr, &vkinfo->surface2);
+	VkResult surfaceresult = vkCreateXlibSurfaceKHR(vkinfo->inst, &surfaceinfo, nullptr, &vkinfo->surface);
+	VkResult surfaceresult2 = glfwCreateWindowSurface(vkinfo->inst, vkinfo->window, nullptr, &vkinfo->surface2);
 
 	testresult(surfaceresult, "x11 surface creation");
 	testresult(surfaceresult2, "glfw surface creation");
@@ -487,11 +490,11 @@ void vulkantest::cleanup(){
 
 	//vkReleaseDisplayEXT(physicaldevice, vkinfo->display);
 	//free(vkinfo);
-	delete vkinfo;
 
-	vkDestroySurfaceKHR(inst, vkinfo->surface, nullptr);
+	vkDestroySurfaceKHR(vkinfo->inst, vkinfo->surface, nullptr);
 	vkDestroyCommandPool(device, commandpool, nullptr);
 	vkDestroyDevice(device, nullptr);
-	vkDestroyInstance(inst, nullptr);
+	vkDestroyInstance(vkinfo->inst, nullptr);
+	delete vkinfo;
 	glfwTerminate();
 }
