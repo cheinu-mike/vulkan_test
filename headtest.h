@@ -26,12 +26,13 @@ struct vkvariables{
 	//PFN_vkCreateDebugReportCallbackEXT CreateDebugReportCallback = VK_NULL_HANDLE;
 	//CreateDebugReportCallback = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT");
 	//***?????????
+	PFN_vkCreateDebugUtilsMessengerEXT vkcreatedebugutilsmessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(inst, "vkCreateDebugUtilsMessengerEXT");
 
 	uint32_t defaultlayercount;
 	std::vector<VkLayerProperties> layerproperties;
 	std::vector<const char*> validationlayers = {"VK_LAYER_LUNARG_standard_validation"};
 	uint32_t layercount = static_cast<uint32_t>(validationlayers.size());
-	VkDebugUtilsMessengerEXT messenger;
+	VkDebugUtilsMessengerEXT debugmessenger;
 
 	//PFN_vkDebugUtilsMessengerCallbackEXT debugCallback = VK_NULL_HANDLE;
 	/*(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)

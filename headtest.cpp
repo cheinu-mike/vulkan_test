@@ -96,10 +96,6 @@ void vulkantest::getxlib(){
 
 void vulkantest::validationdebug(){
 
-	PFN_vkCreateDebugUtilsMessengerEXT vkcreatedebugutilsmessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(vkinfo->inst, "vkCreateDebugUtilsMessengerEXT");
-
-	//vkinfo->debugCallback = (PFN_vkDebugUtilsMessengerCallbackEXT)vkGetInstanceProcAddr(vkinfo->inst, "VkDebugUtilsMessengerCallbackEXT");
-
 	VkDebugUtilsMessengerCreateInfoEXT debuginfo = {};
 	debuginfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 	debuginfo.flags = 0;
@@ -108,7 +104,8 @@ void vulkantest::validationdebug(){
 	debuginfo.pfnUserCallback = debugcallback;
 	//debuginfo.pUserData = ;
 
-	VkResult debugresult = vkcreatedebugutilsmessenger(vkinfo->inst, &debuginfo, NULL, &vkinfo->messenger); 
+	//seg fault here and I don't know why
+	VkResult debugresult = vkinfo->vkcreatedebugutilsmessenger(vkinfo->inst, &debuginfo, NULL, &vkinfo->debugmessenger); 
 	std::cout << "segfault" << std::endl;
 
 	testresult(debugresult, "validation layer creation");
