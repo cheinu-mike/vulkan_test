@@ -17,8 +17,8 @@ void vulkantest::run(){
 
 	getxlib();
 
-	createinstance();
 	validationdebug();
+	createinstance();
 	devicestructs();
 	commandbuffers();
 	surfacecreation();
@@ -94,6 +94,26 @@ void vulkantest::getxlib(){
 	std::cout << "\n";
 }
 
+void vulkantest::validationdebug(){
+
+	PFN_vkCreateDebugUtilsMessengerEXT vkcreatedebugutilsmessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(vkinfo->inst, "vkCreateDebugUtilsMessengerEXT");
+
+	//vkinfo->debugCallback = (PFN_vkDebugUtilsMessengerCallbackEXT)vkGetInstanceProcAddr(vkinfo->inst, "VkDebugUtilsMessengerCallbackEXT");
+
+	VkDebugUtilsMessengerCreateInfoEXT debuginfo = {};
+	debuginfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+	debuginfo.flags = 0;
+	debuginfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+	debuginfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+	debuginfo.pfnUserCallback = debugcallback;
+	//debuginfo.pUserData = ;
+
+	VkResult debugresult = vkcreatedebugutilsmessenger(vkinfo->inst, &debuginfo, NULL, &vkinfo->messenger); 
+	std::cout << "segfault" << std::endl;
+
+	testresult(debugresult, "validation layer creation");
+}
+
 void vulkantest::createinstance(){
 
 	VkApplicationInfo appinfo = {};
@@ -128,7 +148,7 @@ void vulkantest::createinstance(){
 		std::cout << "\t" << vkinfo->layerproperties[i].layerName << std::endl;
 		std::cout << vkinfo->layerproperties[i].description << std::endl;
 	}
-
+	
 	VkInstanceCreateInfo instanceCI = {};
 	instanceCI.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	instanceCI.pNext = NULL;
@@ -155,23 +175,6 @@ void vulkantest::createinstance(){
 	testresult(resultinstance, "instance creation");
 
 	std::cout << "\n";
-}
-
-void vulkantest::validationdebug(){
-
-	//PFN_vkDebugUtilsMessengerCallbackEXT usercallback = vkinfo->debugCallback;
-
-	VkDebugUtilsMessengerCreateInfoEXT debuginfo = {};
-	debuginfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-	debuginfo.flags = 0;
-	debuginfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-	debuginfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-	debuginfo.pfnUserCallback = vkinfo->debugCallback;
-	//debuginfo.pUserData = ;
-
-	VkResult debugresult = vkCreateDebugUtilsMessengerEXT(vkinfo->inst, &debuginfo, nullptr, &vkinfo->messenger); 
-
-	testresult(debugresult, "validation layer creation");
 }
 
 void vulkantest::devicestructs(){
@@ -459,7 +462,7 @@ void vulkantest::imageviewcreation(){
 	imageviewinfo.pNext = NULL;
 	imageviewinfo.flags = 0;
 	imageviewinfo.image = vkinfo->image[0];
-	imageviewinfo.viewType = imageviewtype;
+	imageviewinfo.viewType = vkinfo->imageviewtype;
 	imageviewinfo.format = vkinfo->surfaceformats[1].format;
 	imageviewinfo.components.r = VK_COMPONENT_SWIZZLE_R;
 	imageviewinfo.components.g = VK_COMPONENT_SWIZZLE_G;

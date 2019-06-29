@@ -33,8 +33,7 @@ struct vkvariables{
 	uint32_t layercount = static_cast<uint32_t>(validationlayers.size());
 	VkDebugUtilsMessengerEXT messenger;
 
-	//VKAPI_ATTR VkBool32 VKAPI_CALL 
-	PFN_vkDebugUtilsMessengerCallbackEXT debugCallback;
+	//PFN_vkDebugUtilsMessengerCallbackEXT debugCallback = VK_NULL_HANDLE;
 	/*(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 	{
 		std::cout << "Validation Layer: " << pCallbackData->pMessage << std::endl;
@@ -105,6 +104,9 @@ struct vkvariables{
 	uint32_t imagecount;
 	std::vector<VkImage> image; 
 	std::vector<VkImageView> imageview;
+
+	//image view
+	VkImageViewType imageviewtype = VK_IMAGE_VIEW_TYPE_2D;
 };
 
 class vulkantest {
@@ -123,6 +125,16 @@ public:
 			std::cout << "\t ===" << fname << " error code: " << result << " ===" << std::endl;
 			return false;
 		}
+	}
+
+	//call back function. Improve it later
+	static VKAPI_ATTR VkBool32 VKAPI_CALL debugcallback(VkDebugUtilsMessageSeverityFlagBitsEXT 		messageSeverity, 
+												VkDebugUtilsMessageTypeFlagsEXT		 			messageType, 
+												const VkDebugUtilsMessengerCallbackDataEXT* 	pCallbackData, 
+												void* 											pUserData)
+	{
+		std::cout << "Validation Layer: " << pCallbackData->pMessage << std::endl;
+		return VK_FALSE;
 	}
 
 	void run();
@@ -152,10 +164,6 @@ private:
 	XVisualInfo vinfo;
 	VisualID visualid;
 
-	//Image variables
-	VkImageViewType imageviewtype = VK_IMAGE_VIEW_TYPE_2D;
-	VkComponentMapping componentmapping;
-	VkImageSubresourceRange imagesubresourcerange;
 	//===========================================
 	
 	void initwindow();
