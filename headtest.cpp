@@ -17,7 +17,7 @@ void vulkantest::run(){
 
 	getxlib();
 
-	validationdebug();
+	//validationdebug();
 	createinstance();
 	devicestructs();
 	commandbuffers();
@@ -94,6 +94,7 @@ void vulkantest::getxlib(){
 	std::cout << "\n";
 }
 
+/*
 void vulkantest::validationdebug(){
 
 	VkDebugUtilsMessengerCreateInfoEXT debuginfo = {};
@@ -105,13 +106,26 @@ void vulkantest::validationdebug(){
 	//debuginfo.pUserData = ;
 
 	//seg fault here and I don't know why
-	VkResult debugresult = vkinfo->vkcreatedebugutilsmessenger(vkinfo->inst, &debuginfo, NULL, &vkinfo->debugmessenger); 
+	auto vkcreatedebugutilsmessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(vkinfo->inst, "vkCreateDebugUtilsMessengerEXT");
+	VkResult debugresult = vkcreatedebugutilsmessenger(vkinfo->inst, &debuginfo, NULL, &vkinfo->debugmessenger); 
 	std::cout << "segfault" << std::endl;
 
 	testresult(debugresult, "validation layer creation");
 }
+*/
 
 void vulkantest::createinstance(){
+
+	//Validation Section. Will clean up soon
+	//=======================================================
+	VkDebugUtilsMessengerCreateInfoEXT debuginfo = {};
+	debuginfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+	debuginfo.flags = 0;
+	debuginfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+	debuginfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+	debuginfo.pfnUserCallback = debugcallback;
+	//debuginfo.pUserData = ;
+	//=======================================================
 
 	VkApplicationInfo appinfo = {};
 	appinfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -170,6 +184,15 @@ void vulkantest::createinstance(){
 	std::cout << "Enabled extention count: " << instanceCI.enabledExtensionCount << std::endl;
 
 	testresult(resultinstance, "instance creation");
+
+	//Validation section. Will clean up soon
+	//=======================================================
+	auto vkcreatedebugutilsmessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(vkinfo->inst, "vkCreateDebugUtilsMessengerEXT");
+	VkResult debugresult = vkcreatedebugutilsmessenger(vkinfo->inst, &debuginfo, NULL, &vkinfo->debugmessenger); 
+	std::cout << "segfault" << std::endl;
+	//=======================================================
+	
+	testresult(debugresult, "validation layer creation");
 
 	std::cout << "\n";
 }
