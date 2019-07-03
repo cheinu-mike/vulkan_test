@@ -114,17 +114,23 @@ void vulkantest::validationdebug(){
 }
 */
 
+void vulkantest::populatedebugmessenger(VkDebugUtilsMessengerCreateInfoEXT* createinfo){
+
+	createinfo->sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+	createinfo->flags = 0;
+	createinfo->messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+	createinfo->messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+	createinfo->pfnUserCallback = debugcallback;
+	//createinfo->pUserData = ;
+	
+}
+
 void vulkantest::createinstance(){
 
 	//Validation Section. Will clean up soon
 	//=======================================================
 	VkDebugUtilsMessengerCreateInfoEXT debuginfo = {};
-	debuginfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-	debuginfo.flags = 0;
-	debuginfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-	debuginfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-	debuginfo.pfnUserCallback = debugcallback;
-	//debuginfo.pUserData = ;
+	populatedebugmessenger(&debuginfo);
 	//=======================================================
 
 	VkApplicationInfo appinfo = {};
@@ -189,7 +195,6 @@ void vulkantest::createinstance(){
 	//=======================================================
 	auto vkcreatedebugutilsmessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(vkinfo->inst, "vkCreateDebugUtilsMessengerEXT");
 	VkResult debugresult = vkcreatedebugutilsmessenger(vkinfo->inst, &debuginfo, NULL, &vkinfo->debugmessenger); 
-	std::cout << "segfault" << std::endl;
 	//=======================================================
 	
 	testresult(debugresult, "validation layer creation");

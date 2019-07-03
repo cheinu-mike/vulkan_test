@@ -166,6 +166,7 @@ private:
 
 	void createinstance();
 	//void validationdebug();
+	void populatedebugmessenger(VkDebugUtilsMessengerCreateInfoEXT* createinfo);
 	void devicestructs();
 	void commandbuffers();
 	void surfacecreation();
