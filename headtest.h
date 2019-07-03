@@ -71,6 +71,7 @@ struct vkvariables{
 	std::vector<uint32_t> qfamindex; 	//vector of graphical bit queue family index
 	std::vector<uint32_t> qfamgraphicsbitindex;
 	uint32_t usablequeues; 				// = static_cast<uint32_t>(qfamindex.size());
+	std::vector<float> queuepriorities = {0.5, 0.6};
 	std::vector<VkQueue> vkqueue;
 	std::vector<VkQueueFamilyProperties> qfamilypropertystruct;
 	uint32_t familypropertycount;
@@ -90,6 +91,7 @@ struct vkvariables{
 	VkSwapchainKHR swapchain;
 	uint32_t presentmodecount;
 	std::vector<VkPresentModeKHR> presentmode;
+	VkBool32 surfacesupport = VK_TRUE;
 	
 	//imagebuffer
 	VkMemoryRequirements memrequirements;

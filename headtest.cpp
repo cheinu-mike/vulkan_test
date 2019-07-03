@@ -268,7 +268,7 @@ void vulkantest::devicestructs(){
 		}
 
 	}
-	float qpriorities[1] = {0.5};
+	//float qpriorities[2] = {0.5, 0.6};
 	std::vector<VkDeviceQueueCreateInfo> qcreateinfo = {};
 
 	for (uint32_t i=0; i < vkinfo->familypropertycount; i++){
@@ -293,9 +293,7 @@ void vulkantest::devicestructs(){
 					qcreateinfo[i].flags = 0;
 					qcreateinfo[i].queueFamilyIndex = i;
 					qcreateinfo[i].queueCount = vkinfo->usablequeues;
-					qcreateinfo[i].pQueuePriorities = qpriorities;
-
-					//vkGetDeviceQueue(device, i,
+					qcreateinfo[i].pQueuePriorities = vkinfo->queuepriorities.data(); 
 	}
 	/*
 	for (std::size_t i = 0; vkinfo->qfamindex.size(); i++){
@@ -328,9 +326,9 @@ void vulkantest::devicestructs(){
 void vulkantest::commandbuffers(){
 
 	std::vector<VkCommandPoolCreateInfo> cmdpoolinfo = {};
-	cmdpoolinfo.resize(vkinfo->familypropertycount);
+	cmdpoolinfo.resize(vkinfo->usablequeues);
 
-	for (uint32_t i; i < vkinfo->familypropertycount; i++){
+	for (uint32_t i = 0; i < vkinfo->usablequeues; i++){
 
 		cmdpoolinfo[i].sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		cmdpoolinfo[i].pNext = NULL;
@@ -411,6 +409,10 @@ void vulkantest::swapchaincreation(){
 	vkinfo->presentmode.resize(vkinfo->presentmodecount);
 	VkResult surpresres = vkGetPhysicalDeviceSurfacePresentModesKHR(physicaldevice, vkinfo->surface2, &vkinfo->presentmodecount, vkinfo->presentmode.data());
 	testresult(surpresres, "surface present mode creation");
+
+	//Surface Support
+	VkResult sursupport = vkGetPhysicalDeviceSurfaceSupportKHR(physicaldevice, 0, vkinfo->surface2, &vkinfo->surfacesupport);
+	testresult(sursupport, "surface support creation");
 
 	//surface formats
 	vkGetPhysicalDeviceSurfaceFormatsKHR(physicaldevice, vkinfo->surface2, &vkinfo->surfaceformatcount, NULL);
