@@ -93,13 +93,12 @@ struct vkvariables{
 	std::vector<VkPresentModeKHR> presentmode;
 	VkBool32 surfacesupport = VK_TRUE;
 	
-	//imagebuffer
-	VkMemoryRequirements memrequirements;
-
 	//images
 	uint32_t imagecount;
 	std::vector<VkImage> image; 
 	std::vector<VkImageView> imageview;
+	VkMemoryRequirements memrequirements;
+	VkPhysicalDeviceMemoryProperties physicalmemprop;
 
 	//image view
 	VkImageViewType imageviewtype = VK_IMAGE_VIEW_TYPE_2D;

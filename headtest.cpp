@@ -491,6 +491,17 @@ void vulkantest::imagecreation(){
 
 	VkResult rescreateimage = vkCreateImage(device, &imagecreateinfo, NULL, &vkinfo->image[0]); 
 	testresult(rescreateimage, "image creation");
+
+	vkGetImageMemoryRequirements(device, vkinfo->image[0], &vkinfo->memrequirements); 
+	vkGetPhysicalDeviceMemoryProperties(physicaldevice, &vkinfo->physicalmemprop);
+
+	VkMemoryAllocateInfo memallocinfo = {};
+	memallocinfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	memallocinfo.pNext = NULL;
+	memallocinfo.allocationSize = vkinfo->memrequirements.size;
+	//memallocinfo.memoryTypeIndex = //create function that will output proper memtype index. Read "device Memory" section in vulkan docs.
+
+	//vkAllocateMemory(device, 
 }
 
 void vulkantest::imagebuffercreation(){
