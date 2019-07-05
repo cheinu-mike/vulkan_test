@@ -23,8 +23,10 @@ void vulkantest::run(){
 	commandbuffers();
 	surfacecreation();
 	swapchaincreation();
-	imagebuffercreation();
+	imagecreation();
+	//imagebuffercreation();
 	imageviewcreation();
+	creategraphicspipeline();
 
 	mainloop();
 	cleanup();
@@ -463,14 +465,9 @@ void vulkantest::swapchaincreation(){
 	vkGetSwapchainImagesKHR(device, vkinfo->swapchain, &vkinfo->imagecount, NULL);
 	std::cout << "Number of swapchain images: " << vkinfo->imagecount << std::endl;
 	vkinfo->image.resize(vkinfo->imagecount);
+	vkinfo->imageview.resize(vkinfo->imagecount);
 	std::cout << "\n";
 
-}
-
-void vulkantest::imagebuffercreation(){
-		std::cout << "right before imagememoryrequirements" << std::endl;
-		vkGetImageMemoryRequirements(device, vkinfo->image[0], &vkinfo->memrequirements);
-		std::cout << "right after imagememoryrequirements" << std::endl;
 }
 
 void vulkantest::imagecreation(){
@@ -478,8 +475,28 @@ void vulkantest::imagecreation(){
 	imagecreateinfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	imagecreateinfo.pNext = NULL;
 	imagecreateinfo.imageType = VK_IMAGE_TYPE_2D;
-	imagecreateinfo.format = VK_FORMAT_D16_UNORM;
-	//imagecreateinfo.extent = ;
+	imagecreateinfo.format = vkinfo->surfaceformats[1].format; //VK_FORMAT_D16_UNORM;
+	imagecreateinfo.extent.width = vkinfo->Width;
+	imagecreateinfo.extent.height = vkinfo->Height;
+	imagecreateinfo.extent.depth = 1;
+	imagecreateinfo.mipLevels = 1;
+	imagecreateinfo.arrayLayers = 1;
+	imagecreateinfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	imagecreateinfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	imagecreateinfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+	imagecreateinfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	imagecreateinfo.queueFamilyIndexCount = 0;
+	imagecreateinfo.pQueueFamilyIndices = NULL;
+	imagecreateinfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED ;
+
+	VkResult rescreateimage = vkCreateImage(device, &imagecreateinfo, NULL, &vkinfo->image[0]); 
+	testresult(rescreateimage, "image creation");
+}
+
+void vulkantest::imagebuffercreation(){
+		std::cout << "right before imagememoryrequirements" << std::endl;
+		vkGetImageMemoryRequirements(device, vkinfo->image[0], &vkinfo->memrequirements);
+		std::cout << "right after imagememoryrequirements" << std::endl;
 }
 
 void vulkantest::imageviewcreation(){
@@ -508,6 +525,10 @@ void vulkantest::imageviewcreation(){
 	testresult(imageviewcreate, "vk image view creation");
 
 	std::cout << "\n";
+}
+
+void vulkantest::creategraphicspipeline(){
+
 }
 
 void vulkantest::mainloop(){

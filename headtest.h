@@ -173,9 +173,11 @@ private:
 	void commandbuffers();
 	void surfacecreation();
 	void swapchaincreation();
-	void imagebuffercreation();
 	void imagecreation();
+	void imagebuffercreation();
 	void imageviewcreation(); 
+
+	void creategraphicspipeline();
 
 	void mainloop();
 	void cleanup();
