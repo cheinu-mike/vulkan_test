@@ -494,14 +494,29 @@ void vulkantest::imagecreation(){
 
 	vkGetImageMemoryRequirements(device, vkinfo->image[0], &vkinfo->memrequirements); 
 	vkGetPhysicalDeviceMemoryProperties(physicaldevice, &vkinfo->physicalmemprop);
+	std::cout << "VkPhysicalDeviceMemoryProperties memorytypecount: " << vkinfo->physicalmemprop.memoryTypeCount << std::endl;
+	std::cout << "VkMemoryType struct size: " << vkinfo->physicalmemprop.memoryTypes[0].propertyFlags << std::endl;
+
+	for(uint32_t i = 0; i < vkinfo->physicalmemprop.memoryTypeCount; ++i){
+		if(vkinfo->physicalmemprop.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT){
+				vkinfo->memoryindex.push_back(i);
+				std::cout << "Optimum memory index is: " << i << std::endl;
+		}	
+	}
+	//uint32_t memindex = getmemoryindex(vkinfo->physicalmemprop.memoryTypeCount, vkinfo->physicalmemprop.memoryTypes);
+	//std::cout << "optimum memory index is: " << memindex << std::endl;
 
 	VkMemoryAllocateInfo memallocinfo = {};
 	memallocinfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	memallocinfo.pNext = NULL;
 	memallocinfo.allocationSize = vkinfo->memrequirements.size;
-	//memallocinfo.memoryTypeIndex = //create function that will output proper memtype index. Read "device Memory" section in vulkan docs.
+	memallocinfo.memoryTypeIndex = vkinfo->memoryindex[0]; //create function that will output proper memtype index. Read "device Memory" section in vulkan docs.
 
-	//vkAllocateMemory(device, 
+	VkResult resallocate = vkAllocateMemory(device, &memallocinfo, NULL, &vkinfo->devicememory); 
+	testresult(resallocate, "Allocate memory creation");
+
+	VkResult resbindmemory = vkBindImageMemory(device, vkinfo->image[0], vkinfo->devicememory, 0);
+	testresult(resbindmemory, "binding memory");
 }
 
 void vulkantest::imagebuffercreation(){

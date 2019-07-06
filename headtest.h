@@ -99,6 +99,8 @@ struct vkvariables{
 	std::vector<VkImageView> imageview;
 	VkMemoryRequirements memrequirements;
 	VkPhysicalDeviceMemoryProperties physicalmemprop;
+	std::vector<uint32_t> memoryindex;
+	VkDeviceMemory devicememory;
 
 	//image view
 	VkImageViewType imageviewtype = VK_IMAGE_VIEW_TYPE_2D;
@@ -131,6 +133,18 @@ public:
 		std::cout << "Validation Layer: " << pCallbackData->pMessage << std::endl;
 		return VK_FALSE;
 	}
+
+	/*
+	uint32_t getmemoryindex(uint32_t memtypecount, VkMemoryType memtypestruct){
+		for(uint32_t i = 0; i < memtypecount; ++i){
+			if(memtypestruct[i].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT){
+				std::cout << "Optimum memory index is: " << i << std::endl;
+				return i;
+			}	
+		}
+
+	}
+	*/
 
 	void run();
 
