@@ -538,7 +538,7 @@ void vulkantest::imageviewcreation(){
 	imageviewinfo.components.g = VK_COMPONENT_SWIZZLE_G;
 	imageviewinfo.components.b = VK_COMPONENT_SWIZZLE_B;
 	imageviewinfo.components.a = VK_COMPONENT_SWIZZLE_A;
-	imageviewinfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+	imageviewinfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	imageviewinfo.subresourceRange.baseMipLevel = 0;
 	imageviewinfo.subresourceRange.levelCount = 1;
 	imageviewinfo.subresourceRange.baseArrayLayer = 0;
@@ -568,8 +568,13 @@ void vulkantest::cleanup(){
 	//vkReleaseDisplayEXT(physicaldevice, vkinfo->display);
 	//free(vkinfo);
 
+	//destroy messenger????
+
 	vkDestroySurfaceKHR(vkinfo->inst, vkinfo->surface, nullptr);
 	vkDestroyCommandPool(device, commandpool, nullptr);
+	vkDestroySwapchainKHR(device, vkinfo->swapchain, NULL);
+	vkDestroyImage(device, vkinfo->image[0], NULL); 
+	vkDestroyImageView(device, vkinfo->imageview[0], NULL);
 	vkDestroyDevice(device, nullptr);
 	vkDestroyInstance(vkinfo->inst, nullptr);
 	delete vkinfo;
