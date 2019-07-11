@@ -568,8 +568,9 @@ void vulkantest::cleanup(){
 	//vkReleaseDisplayEXT(physicaldevice, vkinfo->display);
 	//free(vkinfo);
 
-	//destroy messenger????
+	auto vkdestroydebugutilsmessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(vkinfo->inst, "vkDestroyDebugUtilsMessenger");
 
+	vkdestroydebugutilsmessenger(vkinfo->inst, vkinfo->debugmessenger, NULL); 
 	vkDestroySurfaceKHR(vkinfo->inst, vkinfo->surface, nullptr);
 	vkDestroyCommandPool(device, commandpool, nullptr);
 	vkDestroySwapchainKHR(device, vkinfo->swapchain, NULL);
