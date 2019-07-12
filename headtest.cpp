@@ -538,8 +538,6 @@ void vulkantest::imageviewcreation(){
 	imageviewinfo.subresourceRange.baseArrayLayer = 0;
 	imageviewinfo.subresourceRange.layerCount = 1;
 
-	std::cout << "before segfault" << std::endl;
-
 	VkResult imageviewcreate = vkCreateImageView(device, &imageviewinfo, nullptr, &vkinfo->imageview[0]);
 
 	testresult(imageviewcreate, "vk image view creation");
