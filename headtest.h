@@ -187,8 +187,8 @@ private:
 	void surfacecreation();
 	void swapchaincreation();
 	void imagecreation();
-	void imagebuffercreation();
 	void imageviewcreation(); 
+	void uniformbuffercreation();
 
 	void creategraphicspipeline();
 

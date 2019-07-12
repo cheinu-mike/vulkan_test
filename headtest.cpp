@@ -1,6 +1,7 @@
 #define GLFW_INCLUDE_VULKAN
 #define VK_USE_PLATFORM_XLIB_KHR
 #define VK_USE_PLATFORM_XCB_KHR
+#include "/usr/include/glm/glm.hpp"
 #include "/usr/include/GLFW/glfw3.h"
 //#include "/usr/include/GLFW/glfw3native.h"
 
@@ -24,7 +25,6 @@ void vulkantest::run(){
 	surfacecreation();
 	swapchaincreation();
 	imagecreation();
-	//imagebuffercreation();
 	imageviewcreation();
 	creategraphicspipeline();
 
@@ -462,7 +462,7 @@ void vulkantest::swapchaincreation(){
 
 	testresult(result, "swapchain creation");
 
-	vkGetSwapchainImagesKHR(device, vkinfo->swapchain, &vkinfo->imagecount, NULL);
+	vkGetSwapchainImagesKHR(device, vkinfo->swapchain, &vkinfo->imagecount, NULL); //get another one
 	std::cout << "Number of swapchain images: " << vkinfo->imagecount << std::endl;
 	vkinfo->image.resize(vkinfo->imagecount);
 	vkinfo->imageview.resize(vkinfo->imagecount);
@@ -475,7 +475,7 @@ void vulkantest::imagecreation(){
 	imagecreateinfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	imagecreateinfo.pNext = NULL;
 	imagecreateinfo.imageType = VK_IMAGE_TYPE_2D;
-	imagecreateinfo.format = vkinfo->surfaceformats[1].format; //VK_FORMAT_D16_UNORM;
+	imagecreateinfo.format = vkinfo->surfaceformats[0].format; //VK_FORMAT_D16_UNORM;
 	imagecreateinfo.extent.width = vkinfo->Width;
 	imagecreateinfo.extent.height = vkinfo->Height;
 	imagecreateinfo.extent.depth = 1;
@@ -483,7 +483,7 @@ void vulkantest::imagecreation(){
 	imagecreateinfo.arrayLayers = 1;
 	imagecreateinfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	imagecreateinfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-	imagecreateinfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+	imagecreateinfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 	imagecreateinfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imagecreateinfo.queueFamilyIndexCount = 0;
 	imagecreateinfo.pQueueFamilyIndices = NULL;
@@ -519,12 +519,6 @@ void vulkantest::imagecreation(){
 	testresult(resbindmemory, "binding memory");
 }
 
-void vulkantest::imagebuffercreation(){
-		std::cout << "right before imagememoryrequirements" << std::endl;
-		vkGetImageMemoryRequirements(device, vkinfo->image[0], &vkinfo->memrequirements);
-		std::cout << "right after imagememoryrequirements" << std::endl;
-}
-
 void vulkantest::imageviewcreation(){
 
 	VkImageViewCreateInfo imageviewinfo = {};
@@ -533,7 +527,7 @@ void vulkantest::imageviewcreation(){
 	imageviewinfo.flags = 0;
 	imageviewinfo.image = vkinfo->image[0];
 	imageviewinfo.viewType = vkinfo->imageviewtype;
-	imageviewinfo.format = vkinfo->surfaceformats[1].format;
+	imageviewinfo.format = vkinfo->surfaceformats[0].format;
 	imageviewinfo.components.r = VK_COMPONENT_SWIZZLE_R;
 	imageviewinfo.components.g = VK_COMPONENT_SWIZZLE_G;
 	imageviewinfo.components.b = VK_COMPONENT_SWIZZLE_B;
@@ -551,6 +545,15 @@ void vulkantest::imageviewcreation(){
 	testresult(imageviewcreate, "vk image view creation");
 
 	std::cout << "\n";
+}
+
+void vulkantest::uniformbuffercreation(){
+
+	VkBufferCreateInfo bufferinfo = {};
+	bufferinfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferinfo.pNext = NULL;
+	bufferinfo.flags = 0;
+	//bufferinfo.size = 
 }
 
 void vulkantest::creategraphicspipeline(){
