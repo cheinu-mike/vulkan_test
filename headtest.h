@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <X11/Xlib.h>
+#include <fstream>
 
 struct vkvariables{
 		
@@ -145,6 +146,25 @@ public:
 
 	}
 	*/
+
+	//read shader files (copied from tutorial)
+	static std::vector<char> readfile(const std::string& filename) {
+		std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+		if(!file.is_open()) {
+			std::cout << "failed to open file" << std::endl;
+		}
+
+		size_t filesize = (size_t) file.tellg();
+		std::vector<char> buffer(filesize);
+
+		file.seekg(0);
+		file.read(buffer.data(), filesize);
+		
+		file.close();
+
+		return buffer;	
+	}
 
 	void run();
 

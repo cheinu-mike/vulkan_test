@@ -353,10 +353,12 @@ void vulkantest::commandbuffers(){
 	std::cout << "cmd.commandbuffercount " << cmd.commandBufferCount << std::endl;
 	std::cout << "size of cmdbuffer vector" << vkinfo->cmdbuffers.size() << std::endl;
 
+	/*
 	VkCommandBufferBeginInfo begininfo = {};
 	begininfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 	begininfo.pNext = NULL;
 	begininfo.flags = 0;
+	*/
 
 	//VkResult begincmdbuff = vkBeginCommandBuffer(cmdbuffers[0], &begininfo);
 
