@@ -7,6 +7,8 @@
 #define VK_USE_PLATFORM_XLIB_KHR
 #define VK_USE_PLATFORM_XCB_KHR
 #include "/usr/include/GLFW/glfw3.h"
+#include "/usr/include/glm/glm.hpp"
+#include "/usr/include/glm/ext.hpp"
 #include "/usr/include/GLFW/glfw3native.h"
 
 #include <iostream>
@@ -105,6 +107,27 @@ struct vkvariables{
 
 	//image view
 	VkImageViewType imageviewtype = VK_IMAGE_VIEW_TYPE_2D;
+
+	//uniform buffer
+	VkBuffer buffer;
+};
+
+struct matrixstuff {
+
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
+	glm::mat4 view = glm::lookAt(
+		glm::vec3(-5, 3, -10), // Camera is at (-5,3,-10), in World Space
+		glm::vec3(0, 0, 0),    // and looks at the origin
+		glm::vec3(0, -1, 0)    // Head is up (set to 0,-1,0 to look upside-down)
+		);
+	glm::mat4 model = glm::mat4(1.0f);
+
+	glm::mat4 clip = glm::mat4(1.0f,  0.0f, 0.0f, 0.0f,
+							  0.0f, -1.0f, 0.0f, 0.0f,
+							  0.0f,  0.0f, 0.5f, 0.0f,
+							  0.0f,  0.0f, 0.5f, 1.0f);
+
+	glm::mat4 MVP = clip * projection * view * model;
 };
 
 class vulkantest {
@@ -112,6 +135,7 @@ public:
 	
 	//vkvectors* vkinfo = (vkvectors*)(malloc(sizeof(vkvectors)));
 	vkvariables* vkinfo = new vkvariables;
+	matrixstuff* glminfo =  new matrixstuff;
 
 	bool testresult(VkResult result, std::string fname){
 		if (result == VK_SUCCESS){

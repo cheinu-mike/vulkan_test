@@ -26,6 +26,7 @@ void vulkantest::run(){
 	swapchaincreation();
 	imagecreation();
 	imageviewcreation();
+	uniformbuffercreation();
 	creategraphicspipeline();
 
 	mainloop();
@@ -445,7 +446,7 @@ void vulkantest::swapchaincreation(){
 	swapcreate.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	swapcreate.pNext = NULL;
 	swapcreate.surface = vkinfo->surface2;
-	swapcreate.minImageCount = vkinfo->surfacecapabilities.minImageCount;
+	swapcreate.minImageCount = vkinfo->surfacecapabilities.minImageCount +1;
 	swapcreate.imageFormat = vkinfo->surfaceformats[1].format;
 	swapcreate.imageColorSpace = vkinfo->surfaceformats[1].colorSpace;
 	swapcreate.imageExtent= vkinfo->surfacecapabilities.currentExtent;
@@ -477,7 +478,7 @@ void vulkantest::imagecreation(){
 	imagecreateinfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	imagecreateinfo.pNext = NULL;
 	imagecreateinfo.imageType = VK_IMAGE_TYPE_2D;
-	imagecreateinfo.format = vkinfo->surfaceformats[0].format; //VK_FORMAT_D16_UNORM;
+	imagecreateinfo.format = vkinfo->surfaceformats[0].format;
 	imagecreateinfo.extent.width = vkinfo->Width;
 	imagecreateinfo.extent.height = vkinfo->Height;
 	imagecreateinfo.extent.depth = 1;
@@ -553,7 +554,14 @@ void vulkantest::uniformbuffercreation(){
 	bufferinfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferinfo.pNext = NULL;
 	bufferinfo.flags = 0;
-	//bufferinfo.size = 
+	bufferinfo.size = sizeof(glminfo->MVP); 
+	bufferinfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+	bufferinfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	bufferinfo.queueFamilyIndexCount = 0;
+	bufferinfo.pQueueFamilyIndices = NULL;
+
+	VkResult resbuffercreate = vkCreateBuffer(device, &bufferinfo, NULL, &vkinfo->buffer); 
+	testresult(resbuffercreate, "Uniform Buffer creation");
 }
 
 void vulkantest::creategraphicspipeline(){
@@ -582,5 +590,6 @@ void vulkantest::cleanup(){
 	vkDestroyDevice(device, nullptr);
 	vkDestroyInstance(vkinfo->inst, nullptr);
 	delete vkinfo;
+	delete glminfo;
 	glfwTerminate();
 }
