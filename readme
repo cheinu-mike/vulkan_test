@@ -1,3 +1,6 @@
  g++ *.cpp -lX11 -lglfw -lvulkan
 
+g++ -g -Wall -std=c++17 -lvulkan -lglfw -lX11 $vulkanpath/testing.cpp $vulkanpath/headtest.h $vulkanpath/headtest.cpp
+where $vulkanpath is the folder where the files are
+
  works for compilation on ubuntu 19, with the aforementioned libraries installed of course. 
