@@ -110,6 +110,7 @@ struct vkvariables{
 
 	//uniform buffer
 	VkBuffer buffer;
+	VkMemoryRequirements unimemrequirements;
 };
 
 struct matrixstuff {
