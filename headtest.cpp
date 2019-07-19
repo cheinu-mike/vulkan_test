@@ -574,6 +574,8 @@ void vulkantest::uniformbuffercreation(){
 	VkResult resuniallocate = vkAllocateMemory(device, &uniallocinfo, NULL, &vkinfo->devicememory);
 
 	testresult(resuniallocate, "Uniform Buffer Memory Allocation");
+
+	//VkResult resmapmemory = vkMapMemory(device, vkinfo->devicememory, 0, vkinfo->unimemrequirements.size, 0,  
 }
 
 void vulkantest::creategraphicspipeline(){
