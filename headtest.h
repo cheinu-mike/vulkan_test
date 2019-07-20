@@ -102,7 +102,8 @@ struct vkvariables{
 	std::vector<VkImageView> imageview;
 	VkMemoryRequirements memrequirements;
 	VkPhysicalDeviceMemoryProperties physicalmemprop;
-	std::vector<uint32_t> memoryindex;
+	std::vector<uint32_t> localbitmemoryindex;
+	std::vector<uint32_t> visiblebitmemoryindex;
 	VkDeviceMemory devicememory;
 
 	//image view
@@ -111,6 +112,7 @@ struct vkvariables{
 	//uniform buffer
 	VkBuffer buffer;
 	VkMemoryRequirements unimemrequirements;
+	void* pData;
 };
 
 struct matrixstuff {

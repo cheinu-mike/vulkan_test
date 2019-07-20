@@ -502,9 +502,13 @@ void vulkantest::imagecreation(){
 
 	for(uint32_t i = 0; i < vkinfo->physicalmemprop.memoryTypeCount; ++i){
 		if(vkinfo->physicalmemprop.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT){
-				vkinfo->memoryindex.push_back(i);
-				std::cout << "Optimum memory index is: " << i << std::endl;
+				vkinfo->localbitmemoryindex.push_back(i);
+				std::cout << "Local memory index is: " << i << std::endl;
 		}	
+		else if(vkinfo->physicalmemprop.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT){
+				vkinfo->visiblebitmemoryindex.push_back(i);
+				std::cout << "Visible memory index is: " << i << std::endl;
+		}
 	}
 	//uint32_t memindex = getmemoryindex(vkinfo->physicalmemprop.memoryTypeCount, vkinfo->physicalmemprop.memoryTypes);
 	//std::cout << "optimum memory index is: " << memindex << std::endl;
@@ -513,7 +517,7 @@ void vulkantest::imagecreation(){
 	memallocinfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	memallocinfo.pNext = NULL;
 	memallocinfo.allocationSize = vkinfo->memrequirements.size;
-	memallocinfo.memoryTypeIndex = vkinfo->memoryindex[0]; //create function that will output proper memtype index. Read "device Memory" section in vulkan docs.
+	memallocinfo.memoryTypeIndex = vkinfo->localbitmemoryindex[0]; //create function that will output proper memtype index. Read "device Memory" section in vulkan docs.
 
 	VkResult resallocate = vkAllocateMemory(device, &memallocinfo, NULL, &vkinfo->devicememory); 
 	testresult(resallocate, "Allocate memory creation");
@@ -569,13 +573,22 @@ void vulkantest::uniformbuffercreation(){
 	uniallocinfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	uniallocinfo.pNext = NULL;
 	uniallocinfo.allocationSize = vkinfo->unimemrequirements.size;	
-	uniallocinfo.memoryTypeIndex = 0;
+	uniallocinfo.memoryTypeIndex = vkinfo->visiblebitmemoryindex[0]; // VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT. Read more about it in Device Memory section of Vulkan Documentation
 
 	VkResult resuniallocate = vkAllocateMemory(device, &uniallocinfo, NULL, &vkinfo->devicememory);
-
 	testresult(resuniallocate, "Uniform Buffer Memory Allocation");
 
-	//VkResult resmapmemory = vkMapMemory(device, vkinfo->devicememory, 0, vkinfo->unimemrequirements.size, 0,  
+	VkResult resmapmemory = vkMapMemory(device, vkinfo->devicememory, 0, vkinfo->unimemrequirements.size, 0, &vkinfo->pData);  
+	testresult(resmapmemory, "Uniform Buffer Mapping");
+
+	memcpy(vkinfo->pData, &glminfo->MVP, sizeof(glminfo->MVP));	
+
+	vkUnmapMemory(device, vkinfo->devicememory);
+
+	VkResult resbindunibuffer = vkBindBufferMemory(device, vkinfo->buffer, vkinfo->devicememory, 0);
+	testresult(resbindunibuffer, "Binding Uniform Buffer");
+
+	std::cout << "\n";
 }
 
 void vulkantest::creategraphicspipeline(){
