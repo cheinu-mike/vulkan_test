@@ -113,6 +113,10 @@ struct vkvariables{
 	VkBuffer buffer;
 	VkMemoryRequirements unimemrequirements;
 	void* pData;
+
+	//graphics pipeline
+	VkDescriptorSetLayout descsetlayout; //turn into vector later
+	VkPipelineLayout pipelinelayout;
 };
 
 struct matrixstuff {
