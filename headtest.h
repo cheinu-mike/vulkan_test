@@ -117,6 +117,9 @@ struct vkvariables{
 	//graphics pipeline
 	VkDescriptorSetLayout descsetlayout; //turn into vector later
 	VkPipelineLayout pipelinelayout;
+
+	//descriptor set createdescriptorset()
+	VkDescriptorPool descriptorpool;
 };
 
 struct matrixstuff {
@@ -242,6 +245,7 @@ private:
 	void uniformbuffercreation();
 
 	void creategraphicspipeline();
+	void createdescriptorset();
 
 	void mainloop();
 	void cleanup();

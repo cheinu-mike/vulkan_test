@@ -28,6 +28,7 @@ void vulkantest::run(){
 	imageviewcreation();
 	uniformbuffercreation();
 	creategraphicspipeline();
+	createdescriptorset();
 
 	mainloop();
 	cleanup();
@@ -618,6 +619,26 @@ void vulkantest::creategraphicspipeline(){
 
 	VkResult respipelayout = vkCreatePipelineLayout(device, &pipelayoutinfo, NULL, &vkinfo->pipelinelayout); 
 	testresult(respipelayout, "Pipeline Layout Creation");
+
+	std::cout << "\n";
+}
+
+void vulkantest::createdescriptorset(){
+	VkDescriptorPoolSize type_count[1];
+	type_count[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	type_count[0].descriptorCount = 1;
+
+	VkDescriptorPoolCreateInfo poolcreateinfo = {};
+	poolcreateinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolcreateinfo.pNext = NULL;
+	poolcreateinfo.maxSets = 1;
+	poolcreateinfo.poolSizeCount = 1;
+	poolcreateinfo.pPoolSizes = type_count;
+
+	VkResult resdescriptorpool = vkCreateDescriptorPool(device, &poolcreateinfo, NULL, &vkinfo->descriptorpool);
+	testresult(resdescriptorpool, "Descriptor Pool Creation");
+
+	std::cout << "\n";
 }
 
 void vulkantest::mainloop(){
