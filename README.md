@@ -14,5 +14,7 @@ works for compilation on ubuntu 19, with the aforementioned libraries installed 
 1. Then get graphics pipeline set up
 1. segfault when destorying stuff. Probably destorying more than what I need to.
 
+1. get it running on windows
+
 ### misc notes
 - The inclusion of glm library is possibly slowing down compilation
